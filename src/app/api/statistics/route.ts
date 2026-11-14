@@ -2,6 +2,7 @@ import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
 import { ok, withErrorHandling } from '@/lib/api/respond';
+import { countRecentTechnicalCoverage } from '@/lib/queries/monitoring-coverage';
 
 /**
  * El brief (sección 6) exige que cada métrica declare fuente/período/si es
@@ -24,6 +25,7 @@ async function handleGET(_request: Request) {
     incidentsOpen,
     reportsByCategory,
     mostActive24h,
+    servicesWithRecentTechnicalChecks,
   ] = await Promise.all([
     db.select({ n: sql<number>`count(*)::int` }).from(services).where(eq(services.active, true)),
     db.select({ n: sql<number>`count(*)::int` }).from(categories),
@@ -54,6 +56,7 @@ async function handleGET(_request: Request) {
       .groupBy(services.id)
       .orderBy(desc(sql`count(${reports.id})`))
       .limit(10),
+    countRecentTechnicalCoverage(since24h),
   ]);
 
   return ok(
@@ -65,6 +68,7 @@ async function handleGET(_request: Request) {
         reportsLast24h: reportsLast24h[0]?.n ?? 0,
         incidentsAllTime: incidentsAllTime[0]?.n ?? 0,
         incidentsOpen: incidentsOpen[0]?.n ?? 0,
+        servicesWithRecentTechnicalChecks,
       },
       reportsByCategory,
       mostActiveServices24h: mostActive24h,
@@ -74,6 +78,7 @@ async function handleGET(_request: Request) {
       source: 'Consulta en vivo a PostgreSQL',
       period: 'Totales históricos donde se indica; el resto, últimas 24h',
       estimated: false,
+      technicalCoverageDefinition: 'Servicios activos no demostrativos con al menos una medición técnica registrada en las últimas 24 horas. No prueba disponibilidad ni monitoreo continuo.',
       pendingMetrics: {
         availabilityEstimate: 'Requiere el motor de anomalías (Etapa 3 del plan)',
         meanRecoveryTime: 'Requiere incidentes reales cerrados por el motor (Etapa 3)',

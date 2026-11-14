@@ -5,6 +5,7 @@ import { statusForService } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
 import { pickFeaturedServices, selectWorldwideSpotlights, toHourlySeries, type HourlyReportRow } from './home-trends';
 import { getRecentSurgeScores } from './report-surges';
+import { countRecentTechnicalCoverage } from './monitoring-coverage';
 
 export interface ServiceSummary {
   slug: string;
@@ -101,6 +102,7 @@ export async function getHomeData() {
   const [reportsLast24h] = await db.select({ n: sql<number>`count(*)::int` }).from(reports).where(gte(reports.createdAt, since24h));
   const [incidentsOpen] = await db.select({ n: sql<number>`count(*)::int` }).from(incidents).where(ne(incidents.status, 'resolved'));
   const [incidentsAllTime] = await db.select({ n: sql<number>`count(*)::int` }).from(incidents);
+  const servicesWithRecentTechnicalChecks = await countRecentTechnicalCoverage(since24h);
 
   const activeIncidents = await db
     .select({
@@ -129,6 +131,7 @@ export async function getHomeData() {
       incidentsOpen: incidentsOpen?.n ?? 0,
       incidentsAllTime: incidentsAllTime?.n ?? 0,
       servicesCount: servicesWithStatus.length,
+      servicesWithRecentTechnicalChecks,
     },
     activeIncidents,
     generatedAt: new Date(),

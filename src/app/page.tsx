@@ -58,6 +58,7 @@ export default async function HomePage() {
               <dt className="text-xs text-ink-muted">Incidentes activos</dt>
               <dd className="font-mono text-xl font-semibold tabular-nums">{data.totals.incidentsOpen}</dd>
             </div>
+
           </dl>
         </div>
       </section>
@@ -84,7 +85,7 @@ export default async function HomePage() {
       {/* Servicios de interés: cuadrícula responsive y tendencias reales de reportes. */}
       <section className="home-featured-band mx-auto max-w-6xl px-3 py-12 sm:px-6" aria-labelledby="home-services-title">
         <div className="flex items-start justify-between gap-3 px-1 sm:items-center">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pulse-600">Explora el pulso</p>
             <h2 id="home-services-title" className="mt-1 font-display text-xl font-semibold tracking-tight sm:text-2xl">
               {data.hasRapidSurge
@@ -95,6 +96,11 @@ export default async function HomePage() {
               Si los reportes crecen de forma repentina, esos servicios suben al inicio.
               El orden se actualiza cada minuto a partir de reportes ciudadanos no sospechosos.
               Un aumento de reportes no confirma por sí solo una interrupción.
+            </p>
+            <p className="mt-2 max-w-2xl text-xs text-ink-muted" aria-label="Cobertura de monitoreo verificable">
+              Catálogo: <strong className="font-mono text-ink">{data.totals.servicesCount}</strong> servicios.
+              {' '}Con mediciones técnicas registradas en 24h: <strong className="font-mono text-ink">{data.totals.servicesWithRecentTechnicalChecks}</strong>.
+              {' '}Solo se cuentan servicios no demostrativos; la medición no confirma disponibilidad.
             </p>
           </div>
           <Link href="/servicios" className="shrink-0 pt-1 text-xs font-medium text-brand-600 underline-offset-4 hover:underline sm:text-sm">

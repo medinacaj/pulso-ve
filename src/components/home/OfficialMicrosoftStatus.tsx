@@ -30,11 +30,11 @@ export async function OfficialMicrosoftStatus() {
           RSS oficiales, consultados por el servidor con caché de cinco minutos. Son comunicados del proveedor,
           independientes de los reportes ciudadanos y de las mediciones de PulsoVE.
         </p>
-        <ul className="mt-5 grid gap-4 md:grid-cols-3">
+        <ul className="mt-5 grid min-w-0 grid-cols-1 gap-4 md:grid-cols-3">
           {feeds.map((feed) => {
             const presentation = PRESENTATION[feed.status];
             return (
-              <li key={feed.id} className="rounded-xl border border-border bg-surface p-5">
+              <li key={feed.id} className="min-w-0 break-words rounded-xl border border-border bg-surface p-5">
                 <h3 className="font-display font-semibold">{feed.name}</h3>
                 <span className={'mt-3 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ' + presentation.className}>
                   {presentation.label}
