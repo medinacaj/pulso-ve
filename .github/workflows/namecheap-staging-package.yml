@@ -7,6 +7,8 @@ on:
       - '.github/workflows/namecheap-staging-package.yml'
       - 'scripts/prepare-cpanel.mjs'
       - 'scripts/verify-cpanel-artifact.mjs'
+      - 'scripts/preflight-namecheap.mjs'
+      - 'tests/namecheap-preflight.test.mjs'
       - 'tests/cpanel-artifact.test.mjs'
       - 'next.config.mjs'
       - 'package.json'
@@ -47,7 +49,7 @@ jobs:
       - name: Verify Node code and artifact guard
         run: |
           npm run typecheck
-          node --test tests/cpanel-deploy.test.mjs tests/cpanel-artifact.test.mjs
+          node --test tests/cpanel-deploy.test.mjs tests/cpanel-artifact.test.mjs tests/namecheap-preflight.test.mjs
           npm run test:unit
       - name: Create disposable PostgreSQL schema and catalog
         run: |
