@@ -19,6 +19,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - name: Verify Namecheap cPanel packaging safety
+        run: node --test tests/cpanel-deploy.test.mjs
       - name: Pruebas unitarias con variables ficticias solo de CI
         run: npm run test:unit
         env:

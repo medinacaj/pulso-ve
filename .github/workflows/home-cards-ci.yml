@@ -33,6 +33,10 @@ on:
       - 'tests/api-comments.test.ts'
       - 'tests/comment-moderation-policy.test.ts'
       - '.github/workflows/home-cards-ci.yml'
+      - 'scripts/prepare-cpanel.mjs'
+      - 'tests/cpanel-deploy.test.mjs'
+      - 'docs/DESPLIEGUE-NAMECHEAP.md'
+      - 'package.json'
   push:
     branches: [main, 'feat/home-service-pulse-cards-20261112', 'feat/global-platforms-catalog-20261112']
 permissions:
@@ -78,6 +82,26 @@ jobs:
         run: npm run test:integration
       - name: Build mobile activity index with actual seeded database
         run: npm run build
+      - name: Prepare Namecheap standalone build assets
+        run: node scripts/prepare-cpanel.mjs
+      - name: Smoke test standalone runtime against temporary PostgreSQL
+        run: |
+          HOSTNAME=127.0.0.1 PORT=3057 node .next/standalone/server.js >/tmp/pulsove-cpanel-runtime.log 2>&1 &
+          runtime_pid=$!
+          trap 'kill "$runtime_pid" || true' EXIT
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -fsS --connect-timeout 2 http://127.0.0.1:3057/api/health | grep -q '"status":"ok"'; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat /tmp/pulsove-cpanel-runtime.log
+            exit 1
+          fi
+          curl -fsS http://127.0.0.1:3057/ >/dev/null
       - name: Audit runtime dependencies
         run: npm audit --omit=dev --audit-level=high
       - uses: actions/setup-python@v5
