@@ -186,6 +186,19 @@ with sync_playwright() as playwright:
         grid_columns = grid.evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length")
         assert grid_columns == 2, f"Expected 2 columns at {width}px, got {grid_columns}"
         overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")
+        if overflow > 2:
+            # Diagnosticar el elemento responsable, no ocultar el problema con overflow-x:hidden.
+            offenders = page.evaluate("""() => [...document.body.querySelectorAll('*')]
+              .map(el => {
+                const rect = el.getBoundingClientRect();
+                return {tag: el.tagName, className: typeof el.className === 'string'
+                  ? el.className.slice(0, 90) : '', right: Math.round(rect.right),
+                  left: Math.round(rect.left), scrollWidth: el.scrollWidth};
+              })
+              .filter(item => item.right > window.innerWidth + 2)
+              .slice(0, 16)
+            """)
+            print("Responsive overflow offenders:", offenders)
         assert overflow <= 2, f"Horizontal overflow at {width}px: {overflow}px"
         geometry = cards.evaluate_all("""(items) => items.map(item => {
           const card = item.querySelector('article');
