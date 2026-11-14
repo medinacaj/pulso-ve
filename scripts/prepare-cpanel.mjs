@@ -1,0 +1,79 @@
+import { access, cp, readdir } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+function isEnvironmentFile(name) {
+  return name === '.env' || name.startsWith('.env.');
+}
+
+async function exists(file) {
+  try {
+    await access(file);
+    return true;
+  } catch (error) {
+    if (error?.code === 'ENOENT') return false;
+    throw error;
+  }
+}
+
+async function rejectEnvironmentFiles(folder, relative = '') {
+  for (const entry of await readdir(folder, { withFileTypes: true })) {
+    const entryPath = path.join(folder, entry.name);
+    const relativePath = path.join(relative, entry.name);
+    if (isEnvironmentFile(entry.name)) {
+      throw new Error('Archivo de entorno prohibido en paquete: ' + relativePath);
+    }
+    if (entry.isDirectory() && entry.name !== 'node_modules') {
+      await rejectEnvironmentFiles(entryPath, relativePath);
+    }
+  }
+}
+
+/**
+ * Stage the already-built Next.js standalone artifact for Namecheap cPanel.
+ * Does not build, upload, migrate, run cron, or connect to production.
+ * cPanel's Application startup file is server.js in the staged root.
+ */
+export async function prepareCpanel(root = process.cwd()) {
+  const sourceRoot = path.resolve(root);
+  const standalone = path.join(sourceRoot, '.next', 'standalone');
+  const staticAssets = path.join(sourceRoot, '.next', 'static');
+  const publicAssets = path.join(sourceRoot, 'public');
+
+  if (!(await exists(path.join(standalone, 'server.js')))) {
+    throw new Error('Falta .next/standalone/server.js. Ejecuta npm run build primero.');
+  }
+  if (!(await exists(staticAssets))) {
+    throw new Error('Falta .next/static. Ejecuta npm run build primero.');
+  }
+
+  await rejectEnvironmentFiles(standalone);
+  if (await exists(publicAssets)) await rejectEnvironmentFiles(publicAssets, 'public');
+
+  // Next.js intentionally omits static assets from its standalone build.
+  await cp(staticAssets, path.join(standalone, '.next', 'static'), {
+    recursive: true,
+    force: true,
+  });
+  if (await exists(publicAssets)) {
+    await cp(publicAssets, path.join(standalone, 'public'), {
+      recursive: true,
+      force: true,
+    });
+  }
+
+  await rejectEnvironmentFiles(standalone);
+  return standalone;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  prepareCpanel()
+    .then((directory) => {
+      console.log('Paquete de cPanel preparado en ' + path.relative(process.cwd(), directory));
+      console.log('Inicio: server.js; alojamiento: directorio de aplicación fuera de public_html.');
+    })
+    .catch((error) => {
+      console.error('No se pudo preparar paquete de cPanel: ' + error.message);
+      process.exitCode = 1;
+    });
+}
