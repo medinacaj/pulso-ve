@@ -31,7 +31,7 @@ export async function getAuthorizedAdmin() {
     status: users.status,
   }).from(users).where(eq(users.id, claims.sub)).limit(1);
 
-  if (!user || user.role !== 'admin' || user.status !== 'active' ||
+  if (!user || user.email.toLowerCase() !== settings.adminEmail || user.role !== 'admin' || user.status !== 'active' ||
       adminPasswordFingerprint(user.passwordHash) !== claims.pwd) return null;
 
   return { id: user.id, email: user.email };
