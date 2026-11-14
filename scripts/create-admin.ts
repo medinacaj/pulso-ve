@@ -11,13 +11,14 @@ import { users } from '../src/lib/db/schema';
 import { readAdminSettings } from '../src/lib/auth/admin-security';
 
 async function main() {
-  readAdminSettings();
+  const settings = readAdminSettings();
   const email = (process.env.ADMIN_BOOTSTRAP_EMAIL ?? '').trim().toLowerCase();
   const password = process.env.ADMIN_BOOTSTRAP_PASSWORD ?? '';
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
     throw Error('Correo de administrador inválido');
   }
+  if (email !== settings.adminEmail) throw Error('Correo de bootstrap distinto del propietario configurado');
   if (password.length < 16 || Buffer.byteLength(password, 'utf8') > 72) {
     throw Error('Contraseña de administrador debe tener al menos 16 caracteres y como máximo 72 bytes');
   }
