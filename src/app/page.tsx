@@ -58,16 +58,7 @@ export default async function HomePage() {
               <dt className="text-xs text-ink-muted">Incidentes activos</dt>
               <dd className="font-mono text-xl font-semibold tabular-nums">{data.totals.incidentsOpen}</dd>
             </div>
-            <div>
-              <dt className="text-xs text-ink-muted">Servicios en catálogo</dt>
-              <dd className="font-mono text-xl font-semibold tabular-nums">{data.totals.servicesCount}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-ink-muted" title="Servicios no demostrativos con comprobaciones técnicas registradas durante las últimas 24 horas. No equivale a disponibilidad confirmada.">
-                Con medición técnica (24h)
-              </dt>
-              <dd className="font-mono text-xl font-semibold tabular-nums">{data.totals.servicesWithRecentTechnicalChecks}</dd>
-            </div>
+
           </dl>
         </div>
       </section>
@@ -105,6 +96,11 @@ export default async function HomePage() {
               Si los reportes crecen de forma repentina, esos servicios suben al inicio.
               El orden se actualiza cada minuto a partir de reportes ciudadanos no sospechosos.
               Un aumento de reportes no confirma por sí solo una interrupción.
+            </p>
+            <p className="mt-2 max-w-2xl text-xs text-ink-muted" aria-label="Cobertura de monitoreo verificable">
+              Catálogo: <strong className="font-mono text-ink">{data.totals.servicesCount}</strong> servicios.
+              {' '}Con mediciones técnicas registradas en 24h: <strong className="font-mono text-ink">{data.totals.servicesWithRecentTechnicalChecks}</strong>.
+              {' '}Solo se cuentan servicios no demostrativos; la medición no confirma disponibilidad.
             </p>
           </div>
           <Link href="/servicios" className="shrink-0 pt-1 text-xs font-medium text-brand-600 underline-offset-4 hover:underline sm:text-sm">
