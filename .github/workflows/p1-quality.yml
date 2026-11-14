@@ -20,7 +20,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - name: Verify Namecheap cPanel packaging safety
-        run: node --test tests/cpanel-deploy.test.mjs
+        run: node --test tests/cpanel-deploy.test.mjs tests/namecheap-preflight.test.mjs
       - name: Validar protección SSRF y comprobaciones de red (sin solicitudes externas)
         run: npm run test:unit
         env:
