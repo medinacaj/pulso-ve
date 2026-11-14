@@ -62,6 +62,7 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
 | GET | `/api/incidents` | Incidentes globales (filtros: `service`, `category`, `status`) |
 | GET | `/api/map` | Reportes agregados por estado (24 estados, nunca ubicaciones individuales) |
 | GET | `/api/statistics` | Métricas realmente calculables hoy; lo que depende del motor se declara en `meta.pendingMetrics`, no se inventa |
+| GET | `/api/health/monitoring` | Estado del colector: 503 si está deshabilitado, sin fuentes o con mediciones obsoletas; no certifica disponibilidad de proveedores. |
 | GET | `/api/health` | Comprueba con `SELECT 1` la conexión real a PostgreSQL; responde 200 si funciona y 503 si no. Sin caché y sin información sensible. **No certifica que toda la plataforma esté lista para producción.** |
 | POST | `/api/reports` | Crea un reporte — ver payload abajo |
 
