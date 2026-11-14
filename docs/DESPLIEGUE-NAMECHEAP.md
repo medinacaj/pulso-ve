@@ -23,7 +23,7 @@
 1. Abrir el repositorio GitHub **medinacaj/web-pulso-ve** → pestaña **Actions** → workflow **Namecheap cPanel — paquete staging descargable**.
 2. En **Run workflow**, seleccionar la rama **main** y ejecutar. El proceso compila Next.js 16 con Node.js 22, PostgreSQL 16 **efímero**, realiza pruebas y busca secretos conocidos en el paquete.
 3. Al finalizar exitosamente, abrir esa ejecución y descargar en **Artifacts** el ZIP llamado **pulsove-namecheap-staging-[SHA]**. La descarga manual de GitHub requiere acceso autorizado a la cuenta. El artefacto expira tras siete días.
-4. Extraer el ZIP localmente. Su contenido raíz debe incluir **server.js**, **.next/**, **node_modules/** y **public/** (cuando el proyecto contiene activos públicos). No copiar el directorio de origen ni sustituirlo por una demo estática.
+4. Extraer el ZIP localmente. Su contenido raíz debe incluir **server.js**, **preflight-namecheap.mjs**, **.next/**, **node_modules/** y **public/** (cuando el proyecto contiene activos públicos). No copiar el directorio de origen ni sustituirlo por una demo estática.
 5. Subir el **contenido extraído** al directorio privado que será Application root en cPanel, nunca directamente a **public_html**. Configurar **Setup Node.js App** y variables sensibles en el servidor conforme a la sección siguiente.
 6. El ZIP es únicamente un **artefacto de staging**: no incluye una base de datos productiva, credenciales, programación de sondeos, panel administrativo, SMTP ni certificados. Hasta que se cumplan #109 y las pruebas reales en Namecheap, **no ponerlo frente a tráfico público**.
 
@@ -37,8 +37,9 @@
 4. Introducir las variables sensibles **solo mediante el panel del servidor**, nunca en ZIP, GitHub ni directorio público: `NODE_ENV=production`, `DATABASE_URL` para PostgreSQL 16+ con TLS validado, `ANONYMIZATION_SALT` aleatorio, `SITE_URL`. Añadir otras claves cuando las funciones que dependen de ellas estén implementadas. Mantener `PUBLIC_INDEXABLE=false` y `ENABLE_TECHNICAL_CHECKS=false`. Establecer `TRUSTED_CLIENT_IP_HEADER` solo cuando proxy/encabezados sean verificados.
 5. Confirmar compatibilidad del arranque/puerto/sockets **Passenger** del hosting con el `server.js` generado. No asumir que las pruebas de Node local reproducen el proceso de cPanel.
 6. En PostgreSQL de **staging** ejecutar migraciones versionadas y semillas con rol restringido. No aplicar migraciones ni semillas en la base productiva sin respaldo, revisión de impacto y plan de reversión.
-7. Probar HTTPS, archivos estáticos, `/api/health`, reportes reales, fallas de BD, límites, cookies, cabeceras, logs, privacidad, permisos, reinicios y recuperación. Mantener indexación desactivada hasta aprobación.
-8. Guardar el artefacto anterior para **rollback**, y respaldo de BD restituible. Cambiar DNS o dominio público solo cuando los criterios de [Issue #109](https://github.com/medinacaj/web-pulso-ve/issues/109) estén cumplidos.
+7. En la raíz privada de la aplicación, con las variables reales del servidor cargadas y acceso seguro a PostgreSQL, ejecutar `node preflight-namecheap.mjs`. Solo consulta configuración, versión de PostgreSQL y presencia de tablas; devuelve errores y advertencias **sin imprimir contraseñas, host interno ni secretos**. Debe pasar Node 22+, HTTPS, `DATABASE_URL` para PostgreSQL 16+ y migraciones. Un resultado favorable **no certifica** dominio/SSL, SMTP, monitoreo, sesiones ni producción.
+8. Probar HTTPS, archivos estáticos, `/api/health`, reportes reales, fallas de BD, límites, cookies, cabeceras, logs, privacidad, permisos, reinicios y recuperación. Mantener indexación desactivada hasta aprobación.
+9. Guardar el artefacto anterior para **rollback**, y respaldo de BD restituible. Cambiar DNS o dominio público solo cuando los criterios de [Issue #109](https://github.com/medinacaj/web-pulso-ve/issues/109) estén cumplidos.
 
 ## Pendientes independientes del empaquetado
 
