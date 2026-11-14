@@ -1,0 +1,45 @@
+# Despliegue controlado: Namecheap Stellar Plus (cPanel)
+
+**Decisión (14/11/2026):** usar Namecheap Stellar Plus y dominio propio, sin Vercel. **Este procedimiento aún no se ha ejecutado en la cuenta real**.
+
+## Arquitectura comprobable y restricciones
+
+- PulsoVE usa Next.js 16, Node.js 22+, PostgreSQL 16+ y salida `standalone` ya habilitada en `next.config.mjs`.
+- Namecheap documenta Node.js 22 mediante **Setup Node.js App**; comprobar versión disponible en la cuenta.
+- Hosting compartido: cron no más frecuente que cada 5 minutos; límites sobre procesos independientes persistentes y actividades de rastreo. No desplegar un motor de sondeos sin cumplir las restricciones.
+- La BD PostgreSQL local ofrecida en el hosting no está confirmada como 16+. Conseguir una instancia 16+ accesible de forma segura, con backups probados. No activar recursos no identificados de terceros.
+- Dominio, rutas de aplicación y SSH, TLS, entorno Passenger, PostgreSQL, colas, correo, permisos y rollback: **sin verificar** en producción.
+
+## Empaquetado, sin ejecutar cambios en hosting
+
+1. En ambiente Linux equivalente al servidor con **Node.js 22**, ejecutar `npm ci` con lockfile.
+2. Usar una **base PostgreSQL temporal de compilación** con datos no sensibles y las variables necesarias. Ejecutar `npm run build:cpanel`. Este comando ejecuta `next build`, verifica el servidor standalone generado por Next y copia `public/` y `.next/static/` al paquete.
+3. Verificar manualmente que no existen credenciales, claves ni bases con datos reales en los archivos incluidos. La herramienta impide copiar archivos `.env*` desde las rutas del proyecto, pero no detecta todos los posibles secretos en bundles.
+4. Archivar en ZIP **el contenido de** `.next/standalone/`. Es la raíz a utilizar en el panel; `server.js` ya está generado por Next.js, no es un servidor personalizado.
+5. CI realiza las pruebas de empaquetado y arranque con PostgreSQL **efímero**. Un CI verde no valida la instancia Namecheap.
+
+## cPanel: pasos previstos, pendientes de inspección y ejecución
+
+1. Crear un **subdominio de staging** sobre HTTPS sin indexación. No reemplazar el dominio público actual.
+2. Subir/descomprimir los archivos mediante File Manager/SFTP/SSH en un **directorio privado fuera de `public_html`**, por ejemplo `~/pulsove-staging`.
+3. Ir a **Setup Node.js App** → **Create Application**. Configurar **Node.js 22**, **Production**, **Application root** con el directorio recién creado, **Application URL** con el subdominio y **Application startup file: `server.js`**.
+4. Introducir las variables sensibles **solo mediante el panel del servidor**, nunca en ZIP, GitHub ni directorio público: `NODE_ENV=production`, `DATABASE_URL` para PostgreSQL 16+ con TLS validado, `ANONYMIZATION_SALT` aleatorio, `SITE_URL`. Añadir otras claves cuando las funciones que dependen de ellas estén implementadas. Mantener `PUBLIC_INDEXABLE=false` y `ENABLE_TECHNICAL_CHECKS=false`. Establecer `TRUSTED_CLIENT_IP_HEADER` solo cuando proxy/encabezados sean verificados.
+5. Confirmar compatibilidad del arranque/puerto/sockets **Passenger** del hosting con el `server.js` generado. No asumir que las pruebas de Node local reproducen el proceso de cPanel.
+6. En PostgreSQL de **staging** ejecutar migraciones versionadas y semillas con rol restringido. No aplicar migraciones ni semillas en la base productiva sin respaldo, revisión de impacto y plan de reversión.
+7. Probar HTTPS, archivos estáticos, `/api/health`, reportes reales, fallas de BD, límites, cookies, cabeceras, logs, privacidad, permisos, reinicios y recuperación. Mantener indexación desactivada hasta aprobación.
+8. Guardar el artefacto anterior para **rollback**, y respaldo de BD restituible. Cambiar DNS o dominio público solo cuando los criterios de [Issue #109](https://github.com/medinacaj/web-pulso-ve/issues/109) estén cumplidos.
+
+## Pendientes independientes del empaquetado
+
+- **Monitoreo real:** no hay un trabajador aprobado y permanente; definir fuentes oficiales verificadas y programador compatible, posiblemente fuera del hosting web.
+- **Autenticación/Centro de Control:** no están operativos; no activar acceso público administrativo.
+- **Correo y alerta:** deben probarse con proveedor y dominio reales.
+- **Observabilidad:** `/api/health` solo comprueba la conexión a PostgreSQL; no garantiza monitoreo, correo ni permisos.
+- **Privacidad:** identificar jurisdicciones, datos personales, tratamiento y retención; documentar controles antes de habilitar usuarios reales.
+
+## Referencias oficiales
+
+- Namecheap, [Setup Node.js App](https://www.namecheap.com/support/knowledgebase/article.aspx/10047/2182/how-to-work-with-nodejs-app/)
+- Namecheap, [Next.js en cPanel](https://www.namecheap.com/support/knowledgebase/article.aspx/10686/29/how-to-deploy-reactjs-vitejs-react-native-and-nextjs-applications-in-cpanel/)
+- Next.js, [standalone output](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)
+- Namecheap, [limitaciones de hosting compartido](https://www.namecheap.com/support/knowledgebase/article.aspx/157/22/do-you-have-any-server-resource-restrictions/)
