@@ -9,6 +9,7 @@ export type AdminSettings = {
   jwtSecret: string;
   totpSecret: string;
   siteOrigin: string;
+  adminEmail: string;
 };
 
 export function readAdminSettings(): AdminSettings {
@@ -17,6 +18,10 @@ export function readAdminSettings(): AdminSettings {
   const jwtSecret = process.env.JWT_SECRET ?? '';
   const totpSecret = process.env.ADMIN_TOTP_SECRET_BASE32 ?? '';
   const siteUrl = process.env.SITE_URL ?? '';
+  const adminEmail = (process.env.ADMIN_OWNER_EMAIL ?? '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail) || adminEmail.length > 255) {
+    throw Error('admin_not_configured');
+  }
 
   if (jwtSecret.length < 40 || jwtSecret.toLowerCase().includes('reemplazar')) {
     throw Error('admin_not_configured');
@@ -32,7 +37,7 @@ export function readAdminSettings(): AdminSettings {
   } catch {
     throw Error('admin_not_configured');
   }
-  return { jwtSecret, totpSecret: totpSecret.toUpperCase(), siteOrigin };
+  return { jwtSecret, totpSecret: totpSecret.toUpperCase(), siteOrigin, adminEmail };
 }
 
 function decodeBase32(input: string): Buffer {
