@@ -3,8 +3,8 @@
  * Disabled by default; no daemon, no scraping, no inferred provider status.
  */
 import 'dotenv/config';
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
-import { services, serviceEndpoints, technicalChecks } from '../src/lib/db/schema';
+import { desc, eq, sql } from 'drizzle-orm';
+import { technicalChecks } from '../src/lib/db/schema';
 import { isTechnicalCheckDue, probeHttpsEndpoint, UnsafeMonitorTarget } from '../src/lib/monitoring/https-probe';
 
 function maxChecks(): number {
@@ -20,34 +20,8 @@ async function run() {
 
   // Load DB only when explicitly enabled.
   const { db } = await import('../src/lib/db/client');
-  const latest = db
-    .select({
-      endpointId: technicalChecks.serviceEndpointId,
-      lastCheckedAt: sql<Date>`max(${technicalChecks.checkedAt})`.as('last_checked_at'),
-    })
-    .from(technicalChecks)
-    .groupBy(technicalChecks.serviceEndpointId)
-    .as('latest_technical_check');
-
-  const endpoints = await db
-    .select({
-      id: serviceEndpoints.id,
-      target: serviceEndpoints.target,
-      frequencySeconds: serviceEndpoints.frequencySeconds,
-      timeoutMs: serviceEndpoints.timeoutMs,
-      lastCheckedAt: latest.lastCheckedAt,
-    })
-    .from(serviceEndpoints)
-    .innerJoin(services, eq(services.id, serviceEndpoints.serviceId))
-    .leftJoin(latest, eq(latest.endpointId, serviceEndpoints.id))
-    .where(and(
-      eq(serviceEndpoints.active, true),
-      eq(serviceEndpoints.type, 'https'),
-      eq(services.active, true),
-      eq(services.isDemo, false),
-    ))
-    .orderBy(asc(latest.lastCheckedAt), asc(serviceEndpoints.id))
-    .limit(2000);
+  const { buildDueMonitorTargetsQuery } = await import('../src/lib/queries/monitoring-targets');
+  const endpoints = await buildDueMonitorTargetsQuery();
 
   const now = new Date();
   let probed = 0;
