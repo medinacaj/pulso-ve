@@ -51,6 +51,7 @@ export async function POST(request: Request) {
   const parsed = loginSchema.safeParse(input);
   if (!parsed.success) return failure(400, 'Solicitud inválida');
   const email = parsed.data.email.trim().toLowerCase();
+  if (email !== settings.adminEmail) return failure(401, 'Credenciales o código inválidos');
 
   // HMAC keys are not raw emails or IP addresses in Redis/logs.
   const hashKey = (value: string) => createHmac('sha256', settings.jwtSecret).update(value).digest('hex');
