@@ -23,7 +23,7 @@ async function run() {
   const latest = db
     .select({
       endpointId: technicalChecks.serviceEndpointId,
-      lastCheckedAt: sql<Date>`max(${technicalChecks.checkedAt})`,
+      lastCheckedAt: sql<Date>`max(${technicalChecks.checkedAt})`.as('last_checked_at'),
     })
     .from(technicalChecks)
     .groupBy(technicalChecks.serviceEndpointId)
