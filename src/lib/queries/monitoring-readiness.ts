@@ -20,7 +20,7 @@ export function buildMonitorReadinessQuery(since: Date) {
   const latest = db
     .select({
       endpointId: technicalChecks.serviceEndpointId,
-      lastCheck: sql<Date | null>`max(${technicalChecks.checkedAt})`,
+      lastCheck: sql<Date | null>`max(${technicalChecks.checkedAt})`.as('last_check'),
     })
     .from(technicalChecks)
     .groupBy(technicalChecks.serviceEndpointId)
