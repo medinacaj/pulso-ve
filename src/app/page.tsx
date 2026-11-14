@@ -58,6 +58,16 @@ export default async function HomePage() {
               <dt className="text-xs text-ink-muted">Incidentes activos</dt>
               <dd className="font-mono text-xl font-semibold tabular-nums">{data.totals.incidentsOpen}</dd>
             </div>
+            <div>
+              <dt className="text-xs text-ink-muted">Servicios en catálogo</dt>
+              <dd className="font-mono text-xl font-semibold tabular-nums">{data.totals.servicesCount}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-ink-muted" title="Servicios no demostrativos con comprobaciones técnicas registradas durante las últimas 24 horas. No equivale a disponibilidad confirmada.">
+                Con medición técnica (24h)
+              </dt>
+              <dd className="font-mono text-xl font-semibold tabular-nums">{data.totals.servicesWithRecentTechnicalChecks}</dd>
+            </div>
           </dl>
         </div>
       </section>
