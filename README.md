@@ -132,6 +132,10 @@ implementar.
 - Redis (opcional — sin él, rate limiting y tiempo real degradan a una
   implementación en memoria válida para una sola instancia)
 
+## Centro de Control administrativo (staging, deshabilitado por defecto)
+
+Se incorporó una puerta real de acceso MFA mediante contraseña bcrypt y TOTP para **un administrador** creado explícitamente por CLI, sesión HttpOnly/SameSite Strict y consulta de rol activo a PostgreSQL. El dashboard `/centro-control` solo muestra indicadores reales y no permite modificar datos. `ADMIN_ACCESS_ENABLED=false` mantiene todo bloqueado hasta configurar dominio HTTPS, JWT y TOTP. **No está terminado el sistema de cuentas**: faltan registro público, verificación por correo, recuperación, revocación persistente de sesiones, MFA individual, los módulos de administración y pruebas de extremo a extremo en Namecheap. Detalle y límites: [`docs/ADMIN-SEGURIDAD.md`](docs/ADMIN-SEGURIDAD.md).
+
 ## Namecheap Stellar Plus: empaquetado de staging
 
 El hosting definitivo elegido es **Namecheap Stellar Plus con cPanel**, **no Vercel**. Para generar una build en formato Next.js standalone con assets estáticos se añadió `npm run build:cpanel`; las instrucciones y comprobaciones exigidas están en [`docs/DESPLIEGUE-NAMECHEAP.md`](docs/DESPLIEGUE-NAMECHEAP.md). **No implica que la plataforma ya esté desplegada**. Antes de publicar hay que verificar en la cuenta cPanel real Node.js/Passenger, PostgreSQL 16+, secretos, TLS y los límites del motor de sondeos, y completar autenticación y controles de producción.
@@ -189,7 +193,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
 | `npm run db:seed` | Carga los datos semilla (idempotente): sincroniza categorías y tipos de problema; inserta los estados y servicios que falten |
 | `npm run db:studio` | Explorador visual de la base de datos |
-| `npm run create-admin` | **Pendiente de implementar** (Etapa 6 — panel admin) |
+| `npm run create-admin` | Bootstrap de **un único administrador de staging**, requiere secretos privados, TOTP y PostgreSQL; no se ejecuta automáticamente. Ver `docs/ADMIN-SEGURIDAD.md`. |
 | `npm run aggregate:run -- [--window=N] [--at=ISO]` | Un ciclo del motor: agregación + línea base + anomalías + incidentes |
 | `npm run dev:synthetic-traffic -- [--cleanup]` | Genera/limpia tráfico sintético para probar el motor (ver sección dedicada) |
 
