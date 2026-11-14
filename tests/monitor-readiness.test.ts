@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildDueMonitorTargetsQuery } from '../src/lib/queries/monitoring-targets';
 import {
   buildMonitorReadinessQuery,
   classifyMonitorReadiness,
@@ -11,6 +12,16 @@ describe('salud real del motor técnico', () => {
     expect(classifyMonitorReadiness(true, 3, 0)).toBe('stale');
     expect(classifyMonitorReadiness(true, 3, 2)).toBe('stale');
     expect(classifyMonitorReadiness(true, 3, 3)).toBe('ok');
+  });
+
+  it('selecciona destinos para ejecución con alias de fecha sin consultas sintéticas', () => {
+    const query = buildDueMonitorTargetsQuery().toSQL();
+    expect(query.sql).toContain('latest_technical_check');
+    expect(query.sql).toContain('last_checked_at');
+    expect(query.sql).toContain('service_endpoints');
+    expect(query.sql).toContain('is_demo');
+    expect(query.params).toContain(false);
+    expect(query.params).toContain('https');
   });
 
   it('solo cuenta endpoints verificados y su última medición real en PostgreSQL', () => {
