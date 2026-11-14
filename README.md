@@ -55,6 +55,7 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
 |---|---|---|
 | GET | `/api/services` | Lista servicios activos (filtros: `category`, `q`; paginación `limit`/`offset`) |
 | GET | `/api/services/:slug` | Detalle de un servicio |
+| GET | `/api/services/:slug/technical-checks?period=24h\|7d\|30d` | Histórico real de hasta 200 mediciones HTTPS; nunca expone URL de origen ni datos personales. Solo servicios no demostrativos. |
 | GET | `/api/services/:slug/status` | Estado operativo derivado en vivo de incidentes/ventanas agregadas (sin actividad aún: `insufficient_data`, nunca "normal" por defecto) |
 | GET | `/api/services/:slug/reports` | Reportes recientes, solo campos no identificantes |
 | GET | `/api/services/:slug/incidents` | Incidentes de ese servicio |
@@ -80,6 +81,10 @@ La respuesta de `/api/health` acredita solo la conectividad con PostgreSQL. No v
 
 `cityText`, `networkCarrier` y `comment` son opcionales. Límite: 5 reportes
 por `deviceSeed` por hora (configurable vía `RATE_LIMIT_REPORTS_*`).
+
+## Mediciones HTTPS auténticas en detalle de servicio
+
+La página `/servicios/:slug` incluye ahora un panel de resultados HTTPS observados con filtros de 24 h, 7 d y 30 d, visualización de línea/barras y últimas comprobaciones. Solo muestra datos técnicos persistidos, nunca curvas sintéticas. Las fichas `is_demo=true` mantienen un estado explícito sin fuente verificada. Ninguna medición aislada prueba la disponibilidad de la empresa completa.
 
 ## Sondeos HTTPS reales (deshabilitados por defecto)
 
