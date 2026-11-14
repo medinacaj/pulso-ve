@@ -81,6 +81,10 @@ La respuesta de `/api/health` acredita solo la conectividad con PostgreSQL. No v
 `cityText`, `networkCarrier` y `comment` son opcionales. Límite: 5 reportes
 por `deviceSeed` por hora (configurable vía `RATE_LIMIT_REPORTS_*`).
 
+## Sondeos HTTPS reales (deshabilitados por defecto)
+
+Se añadió un runner de una sola ejecución: `npm run monitor:run`. Solo se activa explícitamente con `ENABLE_TECHNICAL_CHECKS=true`, endpoints HTTPS activos y fichas de servicios revisadas (`is_demo=false`). No prueba que los 579 servicios del catálogo sean operativos ni declara caídas confirmadas de plataformas. Bloquea destinos privados y DNS de riesgo, valida TLS, usa método HEAD, no sigue redirecciones y guarda observaciones reales en PostgreSQL. **No existe un programador habilitado en Namecheap**: lee [`docs/MONITOREO-REAL.md`](docs/MONITOREO-REAL.md) para configurar un entorno compatible con las restricciones del hosting y revisar autorizaciones antes de activar destinos.
+
 ## El motor de anomalías
 
 ```bash
