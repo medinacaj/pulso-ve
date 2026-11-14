@@ -1,7 +1,7 @@
 import { and, desc, eq, ne } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { incidents, aggregatedWindows } from '@/lib/db/schema';
-import { scoreToStatus, STATUS_LABELS_ES, type OperationalStatus } from '@/lib/engine/status-bands';
+import { STATUS_LABELS_ES, type OperationalStatus } from '@/lib/engine/status-bands';
 
 /**
  * Estado visible de un servicio cuando no se necesita el detalle completo
@@ -59,6 +59,25 @@ export interface ServiceStatusDetail {
 }
 
 /**
+ * Sin incidente abierto ni comprobación positiva independiente de disponibilidad,
+ * una ventana de reportes (incluso de puntuación cero) no acredita estado normal.
+ * Conservamos la trazabilidad temporal, pero no inventamos confianza operativa.
+ */
+export function unverifiedStatusFromWindow(
+  window: { windowStart: Date; createdAt: Date } | undefined,
+): ServiceStatusDetail {
+  return {
+    status: 'insufficient_data',
+    label: STATUS_LABELS_ES.insufficient_data,
+    confidence: null,
+    officiallyConfirmed: false,
+    incidentId: null,
+    since: window?.windowStart ?? null,
+    lastUpdated: window?.createdAt ?? null,
+  };
+}
+
+/**
  * Detalle completo de estado para un servicio (usado por
  * GET /api/services/:slug/status y por la página individual del
  * servicio) — una sola fuente de verdad para ambos.
@@ -91,26 +110,5 @@ export async function getServiceStatusDetail(serviceId: string): Promise<Service
     .orderBy(desc(aggregatedWindows.windowStart))
     .limit(1);
 
-  if (!latestWindow) {
-    return {
-      status: 'insufficient_data',
-      label: STATUS_LABELS_ES.insufficient_data,
-      confidence: null,
-      officiallyConfirmed: false,
-      incidentId: null,
-      since: null,
-      lastUpdated: null,
-    };
-  }
-
-  const status = scoreToStatus(latestWindow.confidence);
-  return {
-    status,
-    label: STATUS_LABELS_ES[status],
-    confidence: latestWindow.confidence,
-    officiallyConfirmed: false,
-    incidentId: null,
-    since: latestWindow.windowStart,
-    lastUpdated: latestWindow.createdAt,
-  };
+  return unverifiedStatusFromWindow(latestWindow);
 }
