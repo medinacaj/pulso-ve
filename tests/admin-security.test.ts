@@ -31,12 +31,14 @@ describe('seguridad MFA del Centro de Control', () => {
     vi.stubEnv('JWT_SECRET', 'reemplazar-con-un-secreto');
     vi.stubEnv('ADMIN_TOTP_SECRET_BASE32', TEST_TOTP_SECRET);
     vi.stubEnv('SITE_URL', 'https://pulsove.example.org');
+    vi.stubEnv('ADMIN_OWNER_EMAIL', 'admin@pulsove.example.org');
     expect(() => readAdminSettings()).toThrow('admin_not_configured');
     vi.stubEnv('JWT_SECRET', TEST_JWT_SECRET);
     vi.stubEnv('SITE_URL', 'http://pulsove.example.org');
     expect(() => readAdminSettings()).toThrow('admin_not_configured');
     vi.stubEnv('SITE_URL', 'https://pulsove.example.org');
     expect(readAdminSettings().siteOrigin).toBe('https://pulsove.example.org');
+    expect(readAdminSettings().adminEmail).toBe('admin@pulsove.example.org');
   });
 
   it('requiere origen idéntico al dominio HTTPS autorizado', () => {
