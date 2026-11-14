@@ -85,7 +85,7 @@ export default async function HomePage() {
       {/* Servicios de interés: cuadrícula responsive y tendencias reales de reportes. */}
       <section className="home-featured-band mx-auto max-w-6xl px-3 py-12 sm:px-6" aria-labelledby="home-services-title">
         <div className="flex items-start justify-between gap-3 px-1 sm:items-center">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pulse-600">Explora el pulso</p>
             <h2 id="home-services-title" className="mt-1 font-display text-xl font-semibold tracking-tight sm:text-2xl">
               {data.hasRapidSurge
