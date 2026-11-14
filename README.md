@@ -17,7 +17,7 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
   migraciones generadas y verificadas contra PostgreSQL 16 real (incluida
   una segunda migración aditiva: `reports.network_carrier`).
 - Datos semilla: 24 estados de Venezuela (códigos ISO 3166-2:VE), **579 servicios únicos en 18 categorías**, y 47 tipos de problema. Los 211 servicios previos se conservan; las 368 incorporaciones de listas de Chile, Venezuela e internacionales son candidatas solicitadas y **no tienen verificación individual de presencia o funcionamiento**. Todo servicio semilla está marcado `is_demo: true`; no se inventan URLs oficiales, logos o estadísticas. La geografía de reportes ciudadanos sigue limitada a Venezuela hasta ampliar el modelo de regiones.
-- **API pública real y probada**: 9 endpoints (ver tabla abajo), con
+- **API pública con rutas de datos**: 10 endpoints (ver tabla abajo), con
   validación (zod), rate limiting por identidad anónima (Redis opcional /
   memoria), hash de privacidad (identidad anónima + IP truncada), sobre de
   respuesta consistente y manejo de errores que nunca filtra detalles
@@ -61,6 +61,7 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
 | GET | `/api/incidents` | Incidentes globales (filtros: `service`, `category`, `status`) |
 | GET | `/api/map` | Reportes agregados por estado (24 estados, nunca ubicaciones individuales) |
 | GET | `/api/statistics` | Métricas realmente calculables hoy; lo que depende del motor se declara en `meta.pendingMetrics`, no se inventa |
+| GET | `/api/health` | Comprueba con `SELECT 1` la conexión real a PostgreSQL; responde 200 si funciona y 503 si no. Sin caché y sin información sensible. **No certifica que toda la plataforma esté lista para producción.** |
 | POST | `/api/reports` | Crea un reporte — ver payload abajo |
 
 `POST /api/reports` espera:
@@ -75,6 +76,8 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
   "deviceSeed": "identificador-anónimo-generado-por-el-cliente"
 }
 ```
+La respuesta de `/api/health` acredita solo la conectividad con PostgreSQL. No verifica tareas programadas, frescura de datos, monitoreo independiente, notificaciones, autorización administrativa ni recuperación ante desastres; esas comprobaciones se deben registrar por separado antes de una puesta en producción.
+
 `cityText`, `networkCarrier` y `comment` son opcionales. Límite: 5 reportes
 por `deviceSeed` por hora (configurable vía `RATE_LIMIT_REPORTS_*`).
 
