@@ -29,6 +29,10 @@ Namecheap publica restricciones de cron (mínimo cinco minutos, límites de conc
 
 El operador podrá configurar en una instalación compatible una tarea de *un único ciclo* con frecuencia no inferior a cinco minutos, siempre que respete los límites del proveedor; nunca un daemon de ejecución continua. Es obligatorio observar su resultado real, las fallas y la frescura de `checked_at`. La programación de cron **no se realiza desde el código**.
 
+## Comprobación de frescura
+
+`GET /api/health/monitoring` responde **503** si el sondeo está deshabilitado, no tiene endpoints aprobados, existe algún endpoint activo sin medición reciente o PostgreSQL falla. Responde **200** únicamente cuando todas las fuentes activas y no-demostrativas tienen una medición persistida dentro de `MONITOR_FRESHNESS_SECONDS` (por defecto 1800 segundos). Muestra recuentos y última fecha, **no URLs privadas ni secretos**. Este chequeo no prueba disponibilidad global del proveedor ni sustituye la observabilidad de un planificador real. Si ningún cron está instalado, el estado no debe declararse operativo.
+
 ## Verificación de entrega
 
 - Test unitario de objetivos y rangos DNS prohibidos, ventanas de cinco minutos y error DNS: `npm run test:unit`.
