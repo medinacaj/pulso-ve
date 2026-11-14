@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { BrandMark } from '@/components/home/BrandMark';
 import { ServiceHistoryChart } from '@/components/service/ServiceHistoryChart';
+import { TechnicalHistoryChart } from '@/components/service/TechnicalHistoryChart';
 import { TopIssuesBreakdown } from '@/components/service/TopIssuesBreakdown';
 import { ServiceComments } from '@/components/service/ServiceComments';
 import { getServiceProfile } from '@/lib/catalog/service-profiles';
@@ -151,6 +152,8 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           officiallyConfirmed: incident.officiallyConfirmed,
         }))} />
       </div>
+
+      <TechnicalHistoryChart serviceSlug={service.slug} initial={data.technicalHistory} catalogOnly={service.isDemo} />
 
       <ServiceComments serviceSlug={service.slug} comments={approvedComments.map((comment) => ({
         id: comment.id,

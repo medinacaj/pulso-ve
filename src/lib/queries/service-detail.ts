@@ -6,6 +6,7 @@ import { getServiceStatusDetail } from './status';
 import { getServiceHistory } from './service-history';
 import { historyLowerBound } from './service-history-series';
 import { getApprovedServiceComments } from './service-comments';
+import { getServiceTechnicalHistory } from './service-technical-history';
 
 /** Tipos de problema de la categoría del servicio + los transversales (category_id null). */
 export async function getIssueTypesForCategory(categoryId: string) {
@@ -25,7 +26,7 @@ export async function getServiceDetailData(slug: string) {
   const since7d = new Date(now - 7 * 24 * 60 * 60_000);
   const since30d = new Date(now - 30 * 24 * 60 * 60_000);
 
-  const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents, timelineIncidents, approvedComments] = await Promise.all([
+  const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents, timelineIncidents, approvedComments, technicalHistory] = await Promise.all([
     getServiceStatusDetail(service.id),
     getIssueTypesForCategory(service.category.id),
     getServiceHistory(service.id),
@@ -74,6 +75,7 @@ export async function getServiceDetailData(slug: string) {
       .orderBy(desc(incidents.startedAt))
       .limit(100),
     getApprovedServiceComments(service.id),
+    service.isDemo ? Promise.resolve([]) : getServiceTechnicalHistory(service.id, '24h'),
   ]);
 
   const affectedStates = await db
@@ -87,5 +89,5 @@ export async function getServiceDetailData(slug: string) {
 
   const allStates = await db.select({ code: states.code, name: states.name }).from(states).orderBy(states.name);
 
-  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history, approvedComments };
+  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history, approvedComments, technicalHistory };
 }
