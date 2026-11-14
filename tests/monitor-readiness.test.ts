@@ -33,6 +33,6 @@ describe('salud real del motor técnico', () => {
     expect(q.sql).toContain('count(*) filter');
     expect(q.params).toContain(false);
     expect(q.params).toContain('https');
-    expect(q.params.some((param) => String(param).includes('2026-11-14'))).toBe(true);
+    expect(q.params.some((param) => param instanceof Date && param.toISOString().startsWith('2026-11-14'))).toBe(true);
   });
 });
