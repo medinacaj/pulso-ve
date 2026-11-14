@@ -8,6 +8,8 @@ import { prepareCpanel } from '../scripts/prepare-cpanel.mjs';
 async function fixture(run) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'pulsove-cpanel-'));
   try {
+    await mkdir(path.join(root, 'scripts'), { recursive: true });
+    await writeFile(path.join(root, 'scripts/preflight-namecheap.mjs'), 'console.log("preflight");');
     await run(root);
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -29,6 +31,7 @@ test('prepara el runtime standalone con los assets, preservando server.js', asyn
     const dir = await prepareCpanel(root);
     assert.equal(dir, path.join(root, '.next/standalone'));
     assert.match(await readFile(path.join(dir, 'server.js'), 'utf8'), /runtime/);
+    assert.match(await readFile(path.join(dir, 'preflight-namecheap.mjs'), 'utf8'), /preflight/);
     assert.equal(await readFile(path.join(dir, '.next/static/css/app.css'), 'utf8'), '.app{}');
     assert.equal(await readFile(path.join(dir, 'public/icons/favicon.svg'), 'utf8'), '<svg/>');
 
