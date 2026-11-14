@@ -21,6 +21,12 @@ jobs:
       - run: npm run typecheck
       - name: Verify Namecheap cPanel packaging safety
         run: node --test tests/cpanel-deploy.test.mjs
+      - name: Validar protección SSRF y comprobaciones de red (sin solicitudes externas)
+        run: npm run test:unit
+        env:
+          ENABLE_TECHNICAL_CHECKS: 'false'
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
+          ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
       - name: Pruebas unitarias con variables ficticias solo de CI
         run: npm run test:unit
         env:

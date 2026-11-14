@@ -22,7 +22,8 @@
     "test:unit": "vitest run --exclude tests/api-reports.test.ts --exclude tests/api-comments.test.ts",
     "test:integration": "vitest run tests/api-reports.test.ts tests/api-comments.test.ts",
     "comments:moderate": "tsx scripts/moderate-comments.ts",
-    "build:cpanel": "next build && node scripts/prepare-cpanel.mjs"
+    "build:cpanel": "next build && node scripts/prepare-cpanel.mjs",
+    "monitor:run": "tsx scripts/technical-check-cron.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
