@@ -1,0 +1,86 @@
+name: Namecheap cPanel — paquete staging descargable
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/namecheap-staging-package.yml'
+      - 'scripts/prepare-cpanel.mjs'
+      - 'scripts/verify-cpanel-artifact.mjs'
+      - 'tests/cpanel-artifact.test.mjs'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: pulsove_package
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d pulsove_package"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_package
+      ANONYMIZATION_SALT: BUILD_ONLY_FAKE_NO_REAL_PEOPLE_7294382
+      PUBLIC_INDEXABLE: 'false'
+      ENABLE_TECHNICAL_CHECKS: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install exact lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Verify Node code and artifact guard
+        run: |
+          npm run typecheck
+          node --test tests/cpanel-deploy.test.mjs tests/cpanel-artifact.test.mjs
+          npm run test:unit
+      - name: Create disposable PostgreSQL schema and catalog
+        run: |
+          npm run db:migrate:deploy
+          npm run db:seed
+      - name: Compile Next.js and prepare standalone cPanel folder
+        run: npm run build:cpanel
+      - name: Verify artifact does not include known build-time secrets
+        run: node scripts/verify-cpanel-artifact.mjs
+      - name: Smoke test the exact bundled server
+        run: |
+          HOSTNAME=127.0.0.1 PORT=3057 node .next/standalone/server.js >/tmp/pulsove-cpanel-package.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" || true' EXIT
+          ready=0
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:3057/api/health | grep -q '"status":"ok"'; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat /tmp/pulsove-cpanel-package.log
+            exit 1
+          fi
+          curl -fsS http://127.0.0.1:3057/ >/dev/null
+      - name: Upload staging package for manual Namecheap/cPanel installation
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulsove-namecheap-staging-${{ github.sha }}
+          path: .next/standalone/
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: error

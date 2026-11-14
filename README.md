@@ -135,7 +135,7 @@ implementar.
 
 ## Namecheap Stellar Plus: empaquetado de staging
 
-El hosting definitivo elegido es **Namecheap Stellar Plus con cPanel**, **no Vercel**. Para generar una build en formato Next.js standalone con assets estáticos se añadió `npm run build:cpanel`; las instrucciones y comprobaciones exigidas están en [`docs/DESPLIEGUE-NAMECHEAP.md`](docs/DESPLIEGUE-NAMECHEAP.md). **No implica que la plataforma ya esté desplegada**. Antes de publicar hay que verificar en la cuenta cPanel real Node.js/Passenger, PostgreSQL 16+, secretos, TLS y los límites del motor de sondeos, y completar autenticación y controles de producción.
+El hosting definitivo elegido es **Namecheap Stellar Plus con cPanel**, **no Vercel**. El usuario instalará por su cuenta. El workflow manual de GitHub Actions **Namecheap cPanel — paquete staging descargable** genera un ZIP para cargarlo fuera de `public_html`, sin credenciales productivas ni Vercel. Para generar una build en formato Next.js standalone con assets estáticos se añadió `npm run build:cpanel`; las instrucciones y comprobaciones exigidas están en [`docs/DESPLIEGUE-NAMECHEAP.md`](docs/DESPLIEGUE-NAMECHEAP.md). **No implica que la plataforma ya esté desplegada**. Antes de publicar hay que verificar en la cuenta cPanel real Node.js/Passenger, PostgreSQL 16+, secretos, TLS y los límites del motor de sondeos, y completar autenticación y controles de producción.
 
 ## Instalación
 
