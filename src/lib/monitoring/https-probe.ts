@@ -19,7 +19,8 @@ export class UnsafeMonitorTarget extends Error {
   }
 }
 
-const blocked = new BlockList();
+const blockedIpv4 = new BlockList();
+const blockedIpv6 = new BlockList();
 const blockedV4: Array<[string, number]> = [
   ['0.0.0.0', 8], ['10.0.0.0', 8], ['100.64.0.0', 10],
   ['127.0.0.0', 8], ['169.254.0.0', 16], ['172.16.0.0', 12],
@@ -32,15 +33,17 @@ const blockedV6: Array<[string, number]> = [
   ['2001::', 32], ['2001:db8::', 32], ['2001:10::', 28],
   ['2001:20::', 28], ['2002::', 16], // Teredo, documentation, ORCHID, 6to4
 ];
-for (const [ip, prefix] of blockedV4) blocked.addSubnet(ip, prefix, 'ipv4');
-for (const [ip, prefix] of blockedV6) blocked.addSubnet(ip, prefix, 'ipv6');
+for (const [ip, prefix] of blockedV4) blockedIpv4.addSubnet(ip, prefix, 'ipv4');
+for (const [ip, prefix] of blockedV6) blockedIpv6.addSubnet(ip, prefix, 'ipv6');
 
 export function isPublicMonitorAddress(address: string): boolean {
   const family = isIP(address);
   if (!family) return false;
   // IPv4-mapped IPv6 must not bypass IPv4 filtering.
   if (family === 6 && /^::ffff:/i.test(address)) return false;
-  return !blocked.check(address, family === 4 ? 'ipv4' : 'ipv6');
+  return family === 4
+    ? !blockedIpv4.check(address, 'ipv4')
+    : !blockedIpv6.check(address, 'ipv6');
 }
 
 /** Strictly HTTPS:443 and manually configured public DNS hostnames.
@@ -58,6 +61,7 @@ export function parseHttpsMonitorTarget(raw: string): URL {
     url.protocol !== 'https:' ||
     (url.port !== '' && url.port !== '443') ||
     !host.includes('.') ||
+    host.includes(':') ||
     isIP(host) !== 0 ||
     host === 'localhost' ||
     /\.(localhost|local|internal|test|invalid|example|onion|home\.arpa)$/.test(host) ||
