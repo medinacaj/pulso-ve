@@ -10,8 +10,8 @@ import { services, serviceEndpoints, technicalChecks } from '@/lib/db/schema';
  * fichas del catálogo (incluidas las candidatas no verificadas) con servicios
  * efectivamente comprobados. No interpreta el resultado de las mediciones.
  */
-export async function countRecentTechnicalCoverage(since: Date): Promise<number> {
-  const [row] = await db
+export function buildRecentTechnicalCoverageQuery(since: Date) {
+  return db
     .select({ count: sql<number>`count(distinct ${services.id})::int` })
     .from(services)
     .innerJoin(serviceEndpoints, eq(serviceEndpoints.serviceId, services.id))
@@ -23,6 +23,9 @@ export async function countRecentTechnicalCoverage(since: Date): Promise<number>
         gte(technicalChecks.checkedAt, since),
       ),
     );
+}
 
+export async function countRecentTechnicalCoverage(since: Date): Promise<number> {
+  const [row] = await buildRecentTechnicalCoverageQuery(since);
   return row?.count ?? 0;
 }
