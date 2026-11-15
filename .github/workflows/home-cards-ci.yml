@@ -28,6 +28,7 @@ on:
       - 'src/lib/queries/monitoring-readiness.ts'
       - 'src/app/api/health/**'
       - 'tests/monitor-readiness.test.ts'
+      - 'tests/api-monitor-health.test.ts'
       - 'src/components/service/TechnicalHistoryChart.tsx'
       - 'tests/service-technical-history.test.ts'
       - 'src/app/api/services/**'
