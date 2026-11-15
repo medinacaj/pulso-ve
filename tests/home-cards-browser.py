@@ -516,5 +516,22 @@ with sync_playwright() as playwright:
     page.goto("http://127.0.0.1:3000/servicios/aba-cantv", wait_until="networkidle", timeout=60000)
     assert page.get_by_role("heading", name="ABA CANTV", exact=True).count() == 1
 
+    # Email links carry credentials only as client-side fragments; they must
+    # not be serialized into HTML or remain in browser history after hydration.
+    fake_email_token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature123"
+    for route, title in (
+        ("verificar", "Verificar correo"),
+        ("restablecer", "Establecer nueva contraseña"),
+    ):
+        response = page.goto(
+            "http://127.0.0.1:3000/cuenta/" + route + "#token=" + fake_email_token,
+            wait_until="networkidle", timeout=60000,
+        )
+        assert response and response.status == 200
+        page.wait_for_function("location.hash === ''", timeout=15000)
+        assert fake_email_token not in page.url
+        assert fake_email_token not in page.content(), "Credential serialized into page HTML"
+        assert page.get_by_role("heading", name=title, exact=True).count() == 1
+
     print("Mobile cards responsive; quick report links to real protected service form; optional fields collapsed; favorites persist.")
     browser.close()
