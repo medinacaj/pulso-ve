@@ -57,6 +57,23 @@ export function validateNamecheapConfiguration(env = process.env, nodeVersion = 
     warnings.push('Centro de Control deshabilitado; no hay acceso administrativo todavía');
   }
 
+  if (env.PUBLIC_ACCOUNTS_ENABLED === 'true') {
+    const accountSecret = env.ACCOUNT_TOKEN_SECRET ?? '';
+    if (accountSecret.length < 48 ||
+        /reemplazar|example|test_secret|ci_only/i.test(accountSecret)) {
+      failures.push('ACCOUNT_TOKEN_SECRET insuficiente');
+    }
+    if (!/^re_[a-zA-Z0-9_-]{10,}$/.test(env.RESEND_API_KEY ?? '')) {
+      failures.push('RESEND_API_KEY no configurada');
+    }
+    if (!/^[^<>\\r\\n\\s@]+@[^<>\\r\\n\\s@]+\\.[^<>\\r\\n\\s@]+$/.test(env.ACCOUNT_MAIL_FROM ?? '')) {
+      failures.push('ACCOUNT_MAIL_FROM no configurado');
+    }
+    warnings.push('Verificar SPF/DKIM/DMARC, entrega de correo, privacidad y rate limiting externamente');
+  } else {
+    warnings.push('Cuentas ciudadanas deshabilitadas; no se enviarán verificaciones ni recuperaciones');
+  }
+
   if (env.ENABLE_TECHNICAL_CHECKS !== 'true') {
     warnings.push('Colector técnico deshabilitado; no hay sondeos automáticos');
   } else {
