@@ -4,14 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { TechnicalHistoryPeriod } from '@/lib/queries/service-technical-history';
 
-export type TechnicalPoint = {
-  checkedAt: string;
-  success: boolean;
-  statusCode: number | null;
-  latencyMs: number | null;
-  errorCode: string | null;
-  checkType: string;
-};
+import { parseTechnicalHistoryPoints, type TechnicalPoint } from '@/lib/queries/technical-history-points';
 
 const PERIODS: readonly { key: TechnicalHistoryPeriod; label: string }[] = [
   { key: '24h', label: '24 horas' },
@@ -38,7 +31,7 @@ export function TechnicalHistoryChart({
 }) {
   const [period, setPeriod] = useState<TechnicalHistoryPeriod>('24h');
   const [mode, setMode] = useState<'line' | 'bars'>('line');
-  const [points, setPoints] = useState<TechnicalPoint[]>(initial);
+  const [points, setPoints] = useState<TechnicalPoint[]>(() => parseTechnicalHistoryPoints(initial) ?? []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const currentRequest = useRef<AbortController | null>(null);
@@ -60,8 +53,9 @@ export function TechnicalHistoryChart({
       );
       if (!response.ok) throw new Error('request_failed');
       const payload: { data?: unknown } = await response.json();
-      if (!Array.isArray(payload.data)) throw new Error('invalid_response');
-      if (!controller.signal.aborted) setPoints(payload.data as TechnicalPoint[]);
+      const validated = parseTechnicalHistoryPoints(payload?.data);
+      if (!validated) throw new Error('invalid_response');
+      if (!controller.signal.aborted) setPoints(validated);
     } catch {
       if (!controller.signal.aborted) {
         setError(true);
