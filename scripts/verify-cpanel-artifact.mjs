@@ -1,4 +1,4 @@
-import { access, lstat, readFile, readdir } from 'node:fs/promises';
+import { access, lstat, readFile, readdir, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -40,8 +40,20 @@ export async function verifyCpanelArtifact(
         throw new Error('Archivo de entorno incluido: ' + relative);
       }
       if (entry.isSymbolicLink()) {
-        // Avoid distributing broken or externally escaping references.
-        throw new Error('Enlace simbólico sin revisar en paquete: ' + relative);
+        // Next.js standalone may legitimately link bcryptjs and traced modules.
+        // Allow only *existing* targets whose canonical path remains inside
+        // the package root. Never follow links outside the distributable.
+        let resolved;
+        try {
+          resolved = await realpath(full);
+        } catch {
+          throw new Error('Enlace simbólico roto en paquete: ' + relative);
+        }
+        const inside = path.relative(root, resolved);
+        if (inside === '..' || inside.startsWith('..' + path.sep) || path.isAbsolute(inside)) {
+          throw new Error('Enlace simbólico fuera del paquete: ' + relative);
+        }
+        continue;
       }
       if (entry.isDirectory()) {
         await inspect(full);

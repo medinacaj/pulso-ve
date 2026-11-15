@@ -39,12 +39,16 @@ export async function prepareCpanel(root = process.cwd()) {
   const standalone = path.join(sourceRoot, '.next', 'standalone');
   const staticAssets = path.join(sourceRoot, '.next', 'static');
   const publicAssets = path.join(sourceRoot, 'public');
+  const preflight = path.join(sourceRoot, 'scripts', 'preflight-namecheap.mjs');
 
   if (!(await exists(path.join(standalone, 'server.js')))) {
     throw new Error('Falta .next/standalone/server.js. Ejecuta npm run build primero.');
   }
   if (!(await exists(staticAssets))) {
     throw new Error('Falta .next/static. Ejecuta npm run build primero.');
+  }
+  if (!(await exists(preflight))) {
+    throw new Error('Falta scripts/preflight-namecheap.mjs para verificar la instalación.');
   }
 
   await rejectEnvironmentFiles(standalone);
@@ -62,6 +66,8 @@ export async function prepareCpanel(root = process.cwd()) {
     });
   }
 
+  // Copy read-only startup preflight into application root for the hosting owner.
+  await cp(preflight, path.join(standalone, 'preflight-namecheap.mjs'));
   await rejectEnvironmentFiles(standalone);
   return standalone;
 }
