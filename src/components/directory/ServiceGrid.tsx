@@ -6,18 +6,20 @@ import { useView } from './ViewToggle';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { FavoriteButton } from '@/components/home/FavoriteButton';
 import { BrandMark } from '@/components/home/BrandMark';
-import { FAVORITES_CHANGE_EVENT, FAVORITES_KEY, parseFavoriteSlugs } from '@/lib/favorites';
+import { FAVORITES_CHANGE_EVENT, browserFavoriteStorage, favoriteState } from '@/lib/favorites';
 import type { DirectoryService } from '@/lib/queries/directory';
 
 export function ServiceGrid({ services }: { services: DirectoryService[] }) {
   const view = useView();
   const [favoriteSlugs, setFavoriteSlugs] = useState<string[]>([]);
+  const [favoritesPersisted, setFavoritesPersisted] = useState(true);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
 
   useEffect(() => {
     const update = () => {
-      try { setFavoriteSlugs(parseFavoriteSlugs(localStorage.getItem(FAVORITES_KEY))); }
-      catch { setFavoriteSlugs([]); }
+      const snapshot = favoriteState.read(browserFavoriteStorage);
+      setFavoriteSlugs(snapshot.slugs);
+      setFavoritesPersisted(snapshot.persisted);
     };
     update();
     window.addEventListener('storage', update);
@@ -62,6 +64,12 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
           Mostrando {visible.length} de {services.length} servicios
         </p>
       </div>
+
+      {!favoritesPersisted && (
+        <p className="mb-4 text-sm text-amber-800 dark:text-amber-200" role="status">
+          No se pueden guardar favoritos en este navegador. Los cambios son temporales y se perderán al recargar.
+        </p>
+      )}
 
       {visible.length === 0 ? (
         <div className="rounded-xl border border-border bg-surface px-5 py-9 text-center" role="status">
