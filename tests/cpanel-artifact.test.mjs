@@ -24,7 +24,7 @@ test('paquete completo sin secretos conocidos es aceptado', async () => {
   });
 });
 
-test('bloquea secretos textuales, archivos .env y enlaces simbólicos', async () => {
+test('bloquea secretos textuales, archivos .env y enlaces simbólicos fuera del paquete', async () => {
   await fixture(async (root) => {
     await writeFile(path.join(root, 'config.json'), '{"key":"SENSITIVE_BUILD_VALUE"}');
     await assert.rejects(verifyCpanelArtifact(root, ['SENSITIVE_BUILD_VALUE']), /confidencial/);
@@ -35,7 +35,9 @@ test('bloquea secretos textuales, archivos .env y enlaces simbólicos', async ()
     await rm(path.join(root, '.env.production'));
 
     await symlink('server.js', path.join(root, 'server-link.js'));
-    await assert.rejects(verifyCpanelArtifact(root, []), /simbólico/);
+    await verifyCpanelArtifact(root, []); // Next.js generated internal symlink
+    await symlink(os.tmpdir(), path.join(root, 'outside-dir'));
+    await assert.rejects(verifyCpanelArtifact(root, []), /fuera del paquete/);
   });
 });
 
