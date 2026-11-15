@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { readAccountActionFragment } from '@/lib/auth/account-fragment';
 
 export type AccountMode = 'register' | 'login' | 'recover' | 'resend' | 'verify' | 'reset';
 const instructions: Record<AccountMode, { title: string; intro: string; button: string; url: string }> = {
@@ -32,11 +33,23 @@ const instructions: Record<AccountMode, { title: string; intro: string; button: 
   },
 };
 
-export function AccountForm({ mode, token = '' }: { mode: AccountMode; token?: string }) {
+export function AccountForm({ mode }: { mode: AccountMode }) {
   const router = useRouter();
   const details = instructions[mode];
   const emailRequired = !['verify', 'reset'].includes(mode);
   const passwordRequired = ['register', 'login', 'reset'].includes(mode);
+  const [token, setToken] = useState('');
+  useEffect(() => {
+    if (mode !== 'verify' && mode !== 'reset') return;
+    const value = readAccountActionFragment(window.location.hash);
+    setToken(value);
+    // Remove the credential from the address bar and subsequent navigation.
+    // Fragments are not sent in HTTP requests, and never enter server props.
+    if (window.location.hash) {
+      window.history.replaceState(window.history.state, '', window.location.pathname);
+    }
+  }, [mode]);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
