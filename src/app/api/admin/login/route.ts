@@ -16,6 +16,8 @@ import {
   verifyAdminTotp,
 } from '@/lib/auth/admin-security';
 
+import { readLimitedJson } from '@/lib/api/limited-json';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
 
   let input: unknown;
   try {
-    input = await request.json();
+    input = await readLimitedJson(request, 4096);
   } catch {
     return failure(400, 'Solicitud inválida');
   }

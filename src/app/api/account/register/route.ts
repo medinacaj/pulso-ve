@@ -10,6 +10,8 @@ import {
 } from '@/lib/auth/account-request';
 import { sendAccountActionEmail } from '@/lib/auth/account-email';
 
+import { readLimitedJson } from '@/lib/api/limited-json';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -21,10 +23,9 @@ const schema = z.object({
 export async function POST(request: Request): Promise<Response> {
   const guard = guardAccountWrite(request);
   if (!guard.allowed) return guard.response;
-  if (Number(request.headers.get('content-length') ?? '0') > 4096) return accountBadRequest();
 
   let body: unknown;
-  try { body = await request.json(); } catch { return accountBadRequest(); }
+  try { body = await readLimitedJson(request, 4096); } catch { return accountBadRequest(); }
   const parsed = schema.safeParse(body);
   if (!parsed.success || !accountPasswordValid(parsed.data.password)) return accountBadRequest();
   const email = normalizeAccountEmail(parsed.data.email);
