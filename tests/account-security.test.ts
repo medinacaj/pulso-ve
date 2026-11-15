@@ -91,7 +91,9 @@ describe('acciones firmadas y tokens de usuario', () => {
     const url = accountActionUrl(origin, 'verify_email', 'sample-token');
     expect(new URL(url).origin).toBe(origin);
     expect(new URL(url).pathname).toBe('/cuenta/verificar');
-    expect(new URL(url).searchParams.get('token')).toBe('sample-token');
+    expect(new URL(url).search).toBe('');
+    expect(new URL(url).hash).toBe('#token=sample-token');
+    expect(new URL(url).pathname).not.toContain('sample-token');
     expect(new URL(accountActionUrl(origin, 'reset_password', 'sample-token')).pathname)
       .toBe('/cuenta/restablecer');
   });

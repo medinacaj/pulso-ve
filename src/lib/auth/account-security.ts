@@ -139,7 +139,8 @@ export function accountRateKey(email: string, secret: string): string {
 export function accountActionUrl(origin: string, kind: ActionKind, token: string): string {
   const path = kind === 'verify_email' ? '/cuenta/verificar' : '/cuenta/restablecer';
   const url = new URL(path, origin);
-  url.searchParams.set('token', token);
+  // Fragment is client-only; tokens do not appear in GET or proxy access logs.
+  url.hash = new URLSearchParams({ token }).toString();
   return url.toString();
 }
 

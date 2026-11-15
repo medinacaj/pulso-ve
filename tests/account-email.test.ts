@@ -30,7 +30,7 @@ describe('transporte transaccional protegido', () => {
     expect(payload.from).toBe('cuentas@example.org');
     expect(payload.to).toEqual(['verified@example.org']);
     expect(payload.subject).toMatch(/verifica/);
-    expect(payload.text).toContain('/cuenta/verificar?token=SIGNED_TEST_TOKEN');
+    expect(payload.text).toContain('/cuenta/verificar#token=SIGNED_TEST_TOKEN');
     expect(payload).not.toHaveProperty('html');
   });
 

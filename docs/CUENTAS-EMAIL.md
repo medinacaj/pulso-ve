@@ -10,6 +10,12 @@
 - Páginas de registro, acceso, verificación, reenvío, recuperación y restablecimiento bajo `/cuenta`, con `noindex` y `no-referrer`.
 - Validación estricta de `Origin` en cada POST; limitación HMAC por correo y por IP únicamente si el proxy es confiable; sin IP confiable se usa un balde compartido para evitar peticiones ilimitadas. Contraseñas de al menos 12 caracteres y máximo 72 bytes bcrypt.
 
+## Tokens solo en el navegador
+
+Los enlaces de verificación y recuperación incluyen el JWT únicamente como fragmento de URL (`#token=...`), nunca como parámetro `?token=...`. Por diseño HTTP, el fragmento **no se envía en GET**, ni llega a Next.js, Namecheap, proxies o logs de acceso. Al abrir el enlace, el componente cliente extrae el token, valida su formato, lo guarda temporalmente en memoria y borra el fragmento de la barra de direcciones antes de mostrar el formulario. El token se transmite exclusivamente en el **cuerpo de un POST protegido por Origin** al confirmar la acción.
+
+No usar seguimiento de clics, redirecciones de enlaces ni analytics externos en correos de verificación que puedan modificar o descartar el fragmento. Los enlaces emitidos antes de este cambio con `?token=` no se admiten (no existían emisiones de producción). Un usuario puede solicitar un enlace nuevo en caso de fallo. El backend sigue validando firma, audiencia, expiración y estado de cuenta.
+
 ## Infraestructura necesaria para una prueba real
 1. Dominio propio HTTPS y `SITE_URL` correcto, PostgreSQL 16+ con TLS y copia de seguridad restaurable.
 2. Cuenta del proveedor de correo **Resend**, aceptación expresa de sus condiciones, revisión de retención, privacidad, subprocesadores y tratamiento transfronterizo. Revisar jurisdicciones de los usuarios y del responsable; no se afirma cumplimiento legal.
