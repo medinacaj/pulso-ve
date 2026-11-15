@@ -6,6 +6,7 @@ import { sanitizeFreeText } from '@/lib/security/sanitize';
 import { getClientIp, hashAnonymousId, hashIpPrefix } from '@/lib/privacy';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { getApprovedServiceComments } from '@/lib/queries/service-comments';
+import { readLimitedJson, RequestBodyTooLargeError } from '@/lib/api/limited-json';
 import { apiError, ok, withErrorHandling } from '@/lib/api/respond';
 
 const LIMIT_PER_DEVICE = 3;
@@ -31,12 +32,14 @@ async function handleGET(_request: Request, context: Context) {
 }
 
 async function handlePOST(request: Request, context: Context) {
-  // Limit payload size before JSON parsing; no personal details are required.
-  const bodyText = await request.text();
-  if (bodyText.length > 2400) return apiError('validation_error', 'Comentario demasiado largo.');
+  // Check actual streamed bytes before parsing, even when Content-Length is absent.
   let body: unknown;
-  try { body = JSON.parse(bodyText); }
-  catch { return apiError('validation_error', 'La solicitud no contiene JSON válido.'); }
+  try { body = await readLimitedJson(request, 2400); }
+  catch (error) {
+    return error instanceof RequestBodyTooLargeError
+      ? apiError('validation_error', 'Comentario demasiado largo.')
+      : apiError('validation_error', 'La solicitud no contiene JSON válido.');
+  }
 
   const input = createServiceCommentSchema.safeParse(body);
   if (!input.success) {
