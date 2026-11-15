@@ -18,6 +18,8 @@ on:
       - 'scripts/create-admin.ts'
       - 'tests/admin-security.test.ts'
       - 'src/lib/queries/admin-comments.ts'
+      - 'src/lib/queries/admin-audit.ts'
+      - 'tests/admin-audit.test.ts'
       - 'tests/admin-comments.test.ts'
       - 'tests/admin-comment-moderation-api.test.ts'
       - 'src/lib/queries/service-detail.ts'
