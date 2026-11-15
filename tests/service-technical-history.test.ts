@@ -43,3 +43,35 @@ describe('histórico técnico verificable y API de rangos', () => {
     expect(query.params).toContain('https');
   });
 });
+
+import { parseTechnicalHistoryPoints } from '../src/lib/queries/technical-history-points';
+
+describe('mediciones técnicas JSON no confiables', () => {
+  const valid = {
+    checkedAt: '2026-11-15T10:00:00.000Z',
+    success: true, statusCode: 200, latencyMs: 123, errorCode: null, checkType: 'https',
+  };
+  it('conserva únicamente puntos HTTPS con fecha y latencia reales', () => {
+    expect(parseTechnicalHistoryPoints([valid])).toEqual([valid]);
+    expect(parseTechnicalHistoryPoints([])).toEqual([]);
+    expect(parseTechnicalHistoryPoints([{ ...valid, privateEndpoint: 'https://internal.test', token: 'secret' }]))
+      .toEqual([valid]);
+  });
+  it('rechaza lotes enormes, fechas imposibles y métricas inconsistentes', () => {
+    for (const input of [
+      null, {}, [null], Array(201).fill(valid),
+      [{ ...valid, checkedAt: 'fecha inválida' }],
+      [{ ...valid, checkedAt: '2026-02-30T00:00:00.000Z' }],
+      [{ ...valid, checkedAt: '2026-11-15T10:00:00' }],
+      [{ ...valid, success: 'true' }],
+      [{ ...valid, latencyMs: -1 }],
+      [{ ...valid, latencyMs: Infinity }],
+      [{ ...valid, latencyMs: '42' }],
+      [{ ...valid, statusCode: 999 }],
+      [{ ...valid, statusCode: 200.5 }],
+      [{ ...valid, checkType: 'unknown' }],
+    ]) {
+      expect(parseTechnicalHistoryPoints(input)).toBeNull();
+    }
+  });
+});
