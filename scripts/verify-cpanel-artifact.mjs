@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const SENSITIVE_NAMES = [
   'DATABASE_URL', 'ANONYMIZATION_SALT', 'JWT_SECRET', 'REDIS_URL',
   'TURNSTILE_SECRET_KEY', 'SMTP_PASS', 'SMTP_PASSWORD',
+  'ACCOUNT_TOKEN_SECRET', 'RESEND_API_KEY',
 ];
 const TEXT_EXTENSIONS = new Set(['.js', '.mjs', '.cjs', '.json', '.html', '.css', '.txt', '.map', '.yaml', '.yml']);
 
