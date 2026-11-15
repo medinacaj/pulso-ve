@@ -10,16 +10,17 @@ import {
   accountBadRequest, accountUnavailable, guardAccountWrite, limitAccountRequest,
 } from '@/lib/auth/account-request';
 
+import { readLimitedJson } from '@/lib/api/limited-json';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request): Promise<Response> {
   const guard = guardAccountWrite(request);
   if (!guard.allowed) return guard.response;
-  if (Number(request.headers.get('content-length') ?? '0') > 4096) return accountBadRequest();
 
   let input: unknown;
-  try { input = await request.json(); } catch { return accountBadRequest(); }
+  try { input = await readLimitedJson(request, 4096); } catch { return accountBadRequest(); }
   const parsed = z.object({
     token: z.string().min(30).max(4096),
     password: z.string().min(12).max(128),

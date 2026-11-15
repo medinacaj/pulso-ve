@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { POST as adminLogin } from '../src/app/api/admin/login/route';
 import {
   adminPasswordFingerprint,
   createAdminSession,
@@ -16,6 +17,23 @@ const TEST_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
 afterEach(() => vi.unstubAllEnvs());
 
 describe('seguridad MFA del Centro de Control', () => {
+  it('rechaza JSON administrativo sobredimensionado sin ejecutar autenticación', async () => {
+    vi.stubEnv('ADMIN_ACCESS_ENABLED', 'true');
+    vi.stubEnv('JWT_SECRET', TEST_JWT_SECRET);
+    vi.stubEnv('ADMIN_TOTP_SECRET_BASE32', TEST_TOTP_SECRET);
+    vi.stubEnv('SITE_URL', 'https://pulsove.example.org');
+    vi.stubEnv('ADMIN_OWNER_EMAIL', 'admin@pulsove.example.org');
+    const input = new Request('https://pulsove.example.org/api/admin/login', {
+      method: 'POST',
+      headers: { origin: 'https://pulsove.example.org', 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'admin@pulsove.example.org', password: 'x'.repeat(5000), otp: '123456' }),
+    });
+    input.headers.delete('content-length');
+    const result = await adminLogin(input);
+    expect(result.status).toBe(400);
+    expect(await result.json()).toMatchObject({ error: { code: 'admin_access_denied' } });
+  });
+
   it('verifica RFC 6238 HMAC SHA1 con ventana temporal estrecha', () => {
     expect(totpAt(TEST_TOTP_SECRET, 59_000)).toBe('287082');
     expect(verifyAdminTotp(TEST_TOTP_SECRET, '287082', 59_000)).toBe(true);

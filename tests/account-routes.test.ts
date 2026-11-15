@@ -4,6 +4,8 @@ import { checkRateLimit } from '../src/lib/security/rate-limit';
 import { sendAccountActionEmail } from '../src/lib/auth/account-email';
 import { signAccountAction } from '../src/lib/auth/account-security';
 import { POST as register } from '../src/app/api/account/register/route';
+import { POST as recover } from '../src/app/api/account/recover/route';
+import { POST as resend } from '../src/app/api/account/resend/route';
 import { POST as verify } from '../src/app/api/account/verify/route';
 import { POST as reset } from '../src/app/api/account/reset/route';
 
@@ -109,6 +111,22 @@ describe('rutas de cuentas con protecciones en servidor', () => {
     mockSelect([{ id, email, role: 'user', status: 'active', passwordHash: hash }]);
     update.mockClear();
     expect((await verify(post('/api/account/verify', { token }))).status).toBe(400);
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('seis rutas de cuenta rechazan JSON excesivo sin cargarlo ni consultar datos', async () => {
+    const oversized = { email, password: 'password-long-enough', token: 'x'.repeat(7000) };
+    for (const [path, handler] of [
+      ['/api/account/register', register], ['/api/account/recover', recover],
+      ['/api/account/resend', resend], ['/api/account/verify', verify],
+      ['/api/account/reset', reset],
+    ] as const) {
+      const req = post(path, oversized);
+      req.headers.delete('content-length');
+      expect((await handler(req)).status).toBe(400);
+    }
+    expect(insert).not.toHaveBeenCalled();
+    expect(select).not.toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
   });
 

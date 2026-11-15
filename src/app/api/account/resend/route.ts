@@ -10,16 +10,17 @@ import {
 } from '@/lib/auth/account-request';
 import { sendAccountActionEmail } from '@/lib/auth/account-email';
 
+import { readLimitedJson } from '@/lib/api/limited-json';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request): Promise<Response> {
   const guard = guardAccountWrite(request);
   if (!guard.allowed) return guard.response;
-  if (Number(request.headers.get('content-length') ?? '0') > 2048) return accountBadRequest();
 
   let body: unknown;
-  try { body = await request.json(); } catch { return accountBadRequest(); }
+  try { body = await readLimitedJson(request, 2048); } catch { return accountBadRequest(); }
   const parsed = z.object({ email: z.email().max(255) }).strict().safeParse(body);
   if (!parsed.success) return accountBadRequest();
 

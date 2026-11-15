@@ -88,6 +88,14 @@ describe('sesiones ciudadanas aisladas del Centro de Control', () => {
     expect(compare).toHaveBeenCalled();
   });
 
+  it('rechaza cuerpos enormes sin Content-Length antes de consultar la base', async () => {
+    const oversized = request({ email: user.email, password: 'secret', padding: 'x'.repeat(10_000) });
+    oversized.headers.delete('content-length');
+    expect((await login(oversized)).status).toBe(400);
+    expect(select).not.toHaveBeenCalled();
+    expect(compare).not.toHaveBeenCalled();
+  });
+
   it('logout solo borra la cookie si el origen es auténtico', async () => {
     const req = (requestOrigin: string) => new Request(origin + '/api/account/logout', {
       method: 'POST', headers: { origin: requestOrigin },
