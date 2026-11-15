@@ -64,10 +64,14 @@ export default async function AdminDashboardPage() {
 
       <section className="mt-8 rounded-xl border border-border bg-surface p-5" aria-labelledby="admin-tools-title">
         <h2 id="admin-tools-title" className="font-display text-lg font-semibold">Módulos disponibles</h2>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           <Link href="/centro-control/comentarios"
             className="inline-flex items-center rounded-lg border border-brand-600 px-4 py-3 text-sm font-semibold text-brand-600 hover:bg-bg">
             Moderar comentarios ({pendingComments[0]?.n ?? 0} pendientes)
+          </Link>
+          <Link href="/centro-control/auditoria"
+            className="inline-flex items-center rounded-lg border border-border px-4 py-3 text-sm font-semibold text-ink hover:bg-bg">
+            Consultar registro de auditoría
           </Link>
         </div>
       </section>
