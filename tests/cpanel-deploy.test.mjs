@@ -10,6 +10,8 @@ async function fixture(run) {
   try {
     await mkdir(path.join(root, 'scripts'), { recursive: true });
     await writeFile(path.join(root, 'scripts/preflight-namecheap.mjs'), 'console.log("preflight");');
+    await mkdir(path.join(root, 'docs'), { recursive: true });
+    await writeFile(path.join(root, 'docs/DESPLIEGUE-NAMECHEAP.md'), '# Guía');
     await run(root);
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -32,6 +34,7 @@ test('prepara el runtime standalone con los assets, preservando server.js', asyn
     assert.equal(dir, path.join(root, '.next/standalone'));
     assert.match(await readFile(path.join(dir, 'server.js'), 'utf8'), /runtime/);
     assert.match(await readFile(path.join(dir, 'preflight-namecheap.mjs'), 'utf8'), /preflight/);
+    assert.equal(await readFile(path.join(dir, 'INSTALACION-NAMECHEAP.md'), 'utf8'), '# Guía');
     assert.equal(await readFile(path.join(dir, '.next/static/css/app.css'), 'utf8'), '.app{}');
     assert.equal(await readFile(path.join(dir, 'public/icons/favicon.svg'), 'utf8'), '<svg/>');
 
