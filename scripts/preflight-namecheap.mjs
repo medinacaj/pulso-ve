@@ -66,7 +66,7 @@ export function validateNamecheapConfiguration(env = process.env, nodeVersion = 
     if (!/^re_[a-zA-Z0-9_-]{10,}$/.test(env.RESEND_API_KEY ?? '')) {
       failures.push('RESEND_API_KEY no configurada');
     }
-    if (!/^[^<>\\r\\n\\s@]+@[^<>\\r\\n\\s@]+\\.[^<>\\r\\n\\s@]+$/.test(env.ACCOUNT_MAIL_FROM ?? '')) {
+    if (!/^[^<>\r\n\s@]+@[^<>\r\n\s@]+\.[^<>\r\n\s@]+$/.test(env.ACCOUNT_MAIL_FROM ?? '')) {
       failures.push('ACCOUNT_MAIL_FROM no configurado');
     }
     warnings.push('Verificar SPF/DKIM/DMARC, entrega de correo, privacidad y rate limiting externamente');
