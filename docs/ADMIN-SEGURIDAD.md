@@ -37,3 +37,9 @@ Seguimiento: [Puertas P0 #109](https://github.com/medinacaj/web-pulso-ve/issues/
 El panel privado `/centro-control/comentarios` selecciona **máximo 50** comentarios con estado `pending`. No expone hashes anónimos ni prefijos IP. El administrador con sesión MFA puede aprobar un comentario o rechazarlo con una razón de 5 a 240 caracteres.
 
 La ruta `POST /api/admin/comments/[id]/moderate` vuelve a validar el origen HTTPS, la sesión y rol administrativo contra PostgreSQL; limita 60 acciones cada 15 minutos y actualiza `service_comments` solo si la fila sigue `pending`. Registra un `audit_logs` en la misma transacción y devuelve conflicto si otra acción ya resolvió el comentario. **No se ha ejecutado contra comentarios reales ni en Namecheap; faltan pruebas E2E y política operativa de moderación.**
+
+## Auditoría de solo lectura (staging)
+
+El propietario autenticado con MFA puede abrir `/centro-control/auditoria` para consultar los 100 eventos más recientes de `audit_logs`. El selector SQL **no** extrae contenido `before`, `after`, identificadores de usuario ni hashes IP: solo acción, tipo de entidad y fecha, ordenados del más reciente al más antiguo. Requiere la misma validación de rol y sesión que el dashboard.
+
+El visor no sustituye una política de retención, exportación, conservación de evidencia ni un sistema de alertas. Se mantiene inactivo por defecto junto con `ADMIN_ACCESS_ENABLED=false`.
