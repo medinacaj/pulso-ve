@@ -34,7 +34,7 @@ export async function OfficialMicrosoftStatus() {
           {feeds.map((feed) => {
             const presentation = PRESENTATION[feed.status];
             return (
-              <li key={feed.id} className="min-w-0 break-words rounded-xl border border-border bg-surface p-5">
+              <li key={feed.id} className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] rounded-xl border border-border bg-surface p-5">
                 <h3 className="font-display font-semibold">{feed.name}</h3>
                 <span className={'mt-3 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ' + presentation.className}>
                   {presentation.label}
