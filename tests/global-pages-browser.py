@@ -381,6 +381,13 @@ with sync_playwright() as playwright:
         page.set_viewport_size({"width": width, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("detail overflow", width)
     page.get_by_role("link", name="Volver a servicios").click()
+    page.wait_for_url("**/web-pulso-ve/servicios/", timeout=30000)
+    # The directory is populated client-side: navigation can finish before
+    # all 579 cards appear. Wait for real rendering, never weaken the count.
+    page.wait_for_function(
+        "() => document.querySelectorAll('#directory-cards .card').length === 579",
+        timeout=30000,
+    )
     assert page.url.endswith("/web-pulso-ve/servicios/")
     assert page.locator("#directory-cards .card").count() == 579
     page.goto(ROOT + "servicios/cloudflare/", wait_until="networkidle")
