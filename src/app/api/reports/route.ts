@@ -5,6 +5,7 @@ import { createReportSchema } from '@/lib/validation/reports';
 import { sanitizeFreeText } from '@/lib/security/sanitize';
 import { hashAnonymousId, hashIpPrefix, getClientIp } from '@/lib/privacy';
 import { checkRateLimit } from '@/lib/security/rate-limit';
+import { readLimitedJson, RequestBodyTooLargeError } from '@/lib/api/limited-json';
 import { ok, apiError, withErrorHandling } from '@/lib/api/respond';
 
 const REPORT_LIMIT_PER_HASH = Number(process.env.RATE_LIMIT_REPORTS_MAX ?? 5);
@@ -63,9 +64,11 @@ async function scoreReport(params: {
 async function handlePOST(request: Request) {
   let body: unknown;
   try {
-    body = await request.json();
-  } catch {
-    return apiError('validation_error', 'El cuerpo de la solicitud no es JSON válido');
+    body = await readLimitedJson(request, 4096);
+  } catch (error) {
+    return error instanceof RequestBodyTooLargeError
+      ? apiError('validation_error', 'El reporte supera el tamaño permitido.')
+      : apiError('validation_error', 'El cuerpo de la solicitud no es JSON válido');
   }
 
   const parsed = createReportSchema.safeParse(body);
