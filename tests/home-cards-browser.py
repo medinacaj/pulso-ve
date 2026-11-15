@@ -533,5 +533,26 @@ with sync_playwright() as playwright:
         assert fake_email_token not in page.content(), "Credential serialized into page HTML"
         assert page.get_by_role("heading", name=title, exact=True).count() == 1
 
+    # Microsoft can publish long, unbroken RSS tokens. Deliberately inject them
+    # into the rendered cards and verify the actual layout at narrow widths.
+    page.goto("http://127.0.0.1:3000/", wait_until="networkidle", timeout=60000)
+    microsoft_cards = page.locator("section[aria-labelledby='microsoft-official-status'] li")
+    assert microsoft_cards.count() >= 1, "Expected Microsoft official status cards"
+    for card in microsoft_cards.all():
+        card.locator("p").first.evaluate("(el) => el.textContent = 'W'.repeat(450)")
+        card.locator("a").evaluate("(el) => el.textContent = 'X'.repeat(450)")
+    for width in (320, 390):
+        page.set_viewport_size({"width": width, "height": 844})
+        for card in microsoft_cards.all():
+            for element in (card, card.locator("p").first, card.locator("a")):
+                rect = element.bounding_box()
+                assert rect is not None
+                assert rect["x"] >= -1 and rect["x"] + rect["width"] <= width + 1, (
+                    "Microsoft RSS overflow", width, rect,
+                )
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), (
+            "Microsoft RSS page overflow", width,
+        )
+
     print("Mobile cards responsive; quick report links to real protected service form; optional fields collapsed; favorites persist.")
     browser.close()
