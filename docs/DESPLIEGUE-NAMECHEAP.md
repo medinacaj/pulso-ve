@@ -20,7 +20,7 @@
 
 ## Obtener ZIP de staging desde GitHub (sin instalar Git en cPanel)
 
-1. Abrir el repositorio GitHub **medinacaj/web-pulso-ve** → pestaña **Actions** → workflow **Namecheap cPanel — paquete staging descargable**. Un paquete se publica automáticamente después de integrar cambios verificados en este propio workflow; también puedes obtener uno actualizado mediante ejecución manual.
+1. Abrir el repositorio GitHub **medinacaj/web-pulso-ve** → pestaña **Actions** → workflow **Namecheap cPanel — paquete staging descargable**. Un paquete se publica automáticamente cuando una nueva revisión entra en la rama `main` (no solo al modificar el workflow); también puedes obtener uno actualizado mediante ejecución manual. Los procesos de compilación obsoletos se cancelan para ahorrar recursos de CI.
 2. Si quieres recompilar la versión actual: en **Run workflow**, seleccionar la rama **main** y ejecutar. Si ya existe una ejecución `push` exitosa de la versión requerida, puedes usar su artefacto sin repetir la compilación. El proceso compila Next.js 16 con Node.js 22, PostgreSQL 16 **efímero**, realiza pruebas y busca secretos conocidos en el paquete.
 3. Al finalizar exitosamente, abrir esa ejecución y descargar en **Artifacts** el ZIP llamado **pulsove-namecheap-staging-[SHA]**. La descarga manual de GitHub requiere acceso autorizado a la cuenta. El artefacto expira tras siete días.
 4. Extraer el ZIP localmente. Su contenido raíz debe incluir **server.js**, **preflight-namecheap.mjs**, **INSTALACION-NAMECHEAP.md**, **BUILD_COMMIT.txt**, **.next/**, **node_modules/** y **public/** (cuando el proyecto contiene activos públicos). No copiar el directorio de origen ni sustituirlo por una demo estática.

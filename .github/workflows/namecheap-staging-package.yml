@@ -3,8 +3,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/namecheap-staging-package.yml'
   pull_request:
     branches: [main]
     paths:
@@ -17,6 +15,9 @@ on:
       - 'next.config.mjs'
       - 'package.json'
       - 'package-lock.json'
+concurrency:
+  group: namecheap-staging-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
