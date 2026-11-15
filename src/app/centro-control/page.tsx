@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { and, eq, gte, ne, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
-import { services, incidents, reports, technicalChecks } from '@/lib/db/schema';
+import { services, incidents, reports, technicalChecks, serviceComments } from '@/lib/db/schema';
 import { getAuthorizedAdmin } from '@/lib/auth/admin-session';
 import { AdminLogoutButton } from '@/components/admin/AdminLogoutButton';
 
@@ -17,12 +18,13 @@ export default async function AdminDashboardPage() {
   if (!admin) redirect('/centro-control/acceso');
 
   const since24h = new Date(Date.now() - 24 * 60 * 60_000);
-  const [activeServices, verifiedServices, openIncidents, reports24h, checks24h] = await Promise.all([
+  const [activeServices, verifiedServices, openIncidents, reports24h, checks24h, pendingComments] = await Promise.all([
     db.select({ n: sql<number>`count(*)::int` }).from(services).where(eq(services.active, true)),
     db.select({ n: sql<number>`count(*)::int` }).from(services).where(and(eq(services.active, true), eq(services.isDemo, false))),
     db.select({ n: sql<number>`count(*)::int` }).from(incidents).where(ne(incidents.status, 'resolved')),
     db.select({ n: sql<number>`count(*)::int` }).from(reports).where(gte(reports.createdAt, since24h)),
     db.select({ n: sql<number>`count(*)::int` }).from(technicalChecks).where(gte(technicalChecks.checkedAt, since24h)),
+    db.select({ n: sql<number>`count(*)::int` }).from(serviceComments).where(eq(serviceComments.moderationStatus, 'pending')),
   ]);
 
   const values = [
@@ -31,6 +33,7 @@ export default async function AdminDashboardPage() {
     { label: 'Incidentes no resueltos', value: openIncidents[0]?.n ?? 0 },
     { label: 'Reportes de las últimas 24 horas', value: reports24h[0]?.n ?? 0 },
     { label: 'Comprobaciones técnicas en 24 horas', value: checks24h[0]?.n ?? 0 },
+    { label: 'Comentarios pendientes de moderación', value: pendingComments[0]?.n ?? 0 },
   ];
 
   return (
@@ -59,10 +62,19 @@ export default async function AdminDashboardPage() {
         </dl>
       </section>
 
+      <section className="mt-8 rounded-xl border border-border bg-surface p-5" aria-labelledby="admin-tools-title">
+        <h2 id="admin-tools-title" className="font-display text-lg font-semibold">Módulos disponibles</h2>
+        <div className="mt-4">
+          <Link href="/centro-control/comentarios"
+            className="inline-flex items-center rounded-lg border border-brand-600 px-4 py-3 text-sm font-semibold text-brand-600 hover:bg-bg">
+            Moderar comentarios ({pendingComments[0]?.n ?? 0} pendientes)
+          </Link>
+        </div>
+      </section>
+
       <p className="mt-8 rounded-lg border border-border bg-bg p-4 text-sm text-ink-muted">
-        Primer bloque operativo de administración: métricas de solo lectura protegidas.
-        Gestión de plataformas, cuentas, incidentes, fuentes, notificaciones y auditoría
-        requieren endpoints RBAC y pruebas independientes antes de habilitar acciones de escritura.
+        Gestión de plataformas, cuentas, incidentes, fuentes y notificaciones
+        sigue pendiente de endpoints RBAC y pruebas específicas. Este panel no simula esas acciones.
       </p>
     </div>
   );

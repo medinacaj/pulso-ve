@@ -1,6 +1,6 @@
 # Acceso administrativo — primer bloque de staging
 
-**Estado:** autenticación de **un único administrador** con contraseña y TOTP, cookie segura y panel de métricas reales de solo lectura. **Desactivado por defecto**, no es un Centro de Control terminado ni está validado en Namecheap real.
+**Estado:** autenticación de **un único administrador** con contraseña y TOTP, cookie segura, panel de métricas reales y moderación de comentarios con escritura auditada. **Desactivado por defecto**, no es un Centro de Control terminado ni está validado en Namecheap real.
 
 ## Controles implementados
 
@@ -26,8 +26,14 @@
 - **No existen todavía** registro público, verificaciones por correo, restablecimiento de contraseña, preferencias de cuenta, suscripciones operativas ni envío SMTP. Tampoco se envía correo al crear el administrador por CLI.
 - **Revocación:** el logout borra la cookie del navegador, pero no invalida el JWT previamente robado hasta expirar (máximo 15 min). La revocación persistente, gestión de sesiones y rotación de claves deben completarse antes de datos sensibles de usuarios.
 - **MFA:** TOTP global del único propietario, sin enrolamiento/autoservicio, códigos de recuperación ni auditoría de reuso. Para más administradores hacen falta secretos individuales cifrados y gestión MFA por usuario.
-- **Centro de Control:** solo dashboard de cinco indicadores reales de lectura; aún faltan los módulos con endpoints RBAC, auditoría de acciones, pruebas de escalada de privilegios y recuperación.
+- **Centro de Control:** dashboard de indicadores reales y módulo de moderación de comentarios (aprobar/rechazar, auditado en transacción). Permanecen pendientes los demás módulos, verificación de sesiones en hosting, auditoría de escalada de privilegios y recuperación.
 - Los mecanismos de rate limiting en memoria se reinician al reiniciar el servidor; si se opera con más de una instancia requiere Redis configurado y probado.
 - El operador debe verificar cumplimiento, privacidad, retención y permisos; no se afirma que la plataforma esté preparada para producción.
 
 Seguimiento: [Puertas P0 #109](https://github.com/medinacaj/web-pulso-ve/issues/109).
+
+## Moderación autorizada (componente implementado)
+
+El panel privado `/centro-control/comentarios` selecciona **máximo 50** comentarios con estado `pending`. No expone hashes anónimos ni prefijos IP. El administrador con sesión MFA puede aprobar un comentario o rechazarlo con una razón de 5 a 240 caracteres.
+
+La ruta `POST /api/admin/comments/[id]/moderate` vuelve a validar el origen HTTPS, la sesión y rol administrativo contra PostgreSQL; limita 60 acciones cada 15 minutos y actualiza `service_comments` solo si la fila sigue `pending`. Registra un `audit_logs` en la misma transacción y devuelve conflicto si otra acción ya resolvió el comentario. **No se ha ejecutado contra comentarios reales ni en Namecheap; faltan pruebas E2E y política operativa de moderación.**
