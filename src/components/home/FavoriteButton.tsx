@@ -1,15 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FAVORITES_CHANGE_EVENT, FAVORITES_KEY, parseFavoriteSlugs, toggleFavorite } from '@/lib/favorites';
+import { FAVORITES_CHANGE_EVENT, browserFavoriteStorage, favoriteState } from '@/lib/favorites';
 
 export function FavoriteButton({ slug, name, inline = false }: { slug: string; name: string; inline?: boolean }) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [persisted, setPersisted] = useState(true);
 
   useEffect(() => {
     const read = () => {
-      try { setIsFavorite(parseFavoriteSlugs(localStorage.getItem(FAVORITES_KEY)).includes(slug)); }
-      catch { setIsFavorite(false); }
+      const snapshot = favoriteState.read(browserFavoriteStorage);
+      setIsFavorite(snapshot.slugs.includes(slug));
+      setPersisted(snapshot.persisted);
     };
     read();
     window.addEventListener('storage', read);
@@ -21,18 +23,11 @@ export function FavoriteButton({ slug, name, inline = false }: { slug: string; n
   }, [slug]);
 
   const onToggle = () => {
-    try {
-      const current = parseFavoriteSlugs(localStorage.getItem(FAVORITES_KEY));
-      const updated = toggleFavorite(current, slug);
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-      setIsFavorite(updated.includes(slug));
-      // The storage event is not fired in this document. Keep repeated
-      // cards for a service synchronized without another tab or reload.
-      window.dispatchEvent(new Event(FAVORITES_CHANGE_EVENT));
-    } catch {
-      // Private browsing/blocked storage: a local UI toggle still works.
-      setIsFavorite((value) => !value);
-    }
+    const updated = favoriteState.toggle(browserFavoriteStorage, slug);
+    setIsFavorite(updated.slugs.includes(slug));
+    setPersisted(updated.persisted);
+    // Keep repeated cards and the directory filter in sync, even in memory-only mode.
+    window.dispatchEvent(new Event(FAVORITES_CHANGE_EVENT));
   };
 
   return (
@@ -40,7 +35,7 @@ export function FavoriteButton({ slug, name, inline = false }: { slug: string; n
       type="button"
       aria-label={isFavorite ? `Quitar ${name} de favoritos` : `Añadir ${name} a favoritos`}
       aria-pressed={isFavorite}
-      title={isFavorite ? 'Quitar de favoritos' : 'Guardar favorito en este navegador'}
+      title={!persisted ? 'Favoritos temporales: no se guardarán al recargar' : isFavorite ? 'Quitar de favoritos' : 'Guardar favorito en este navegador'}
       onClick={onToggle}
       className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-pulse-600 transition-colors hover:bg-pulse-500/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pulse-500 ${inline ? "relative" : "absolute right-3 top-3 z-10 sm:right-4 sm:top-4"}`}
     >
@@ -49,6 +44,7 @@ export function FavoriteButton({ slug, name, inline = false }: { slug: string; n
         strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <path d="m12 2.5 3 6.12 6.75.98-4.88 4.76 1.16 6.72L12 17.91l-6.03 3.17 1.15-6.72-4.87-4.76 6.74-.98L12 2.5Z" />
       </svg>
+      {!persisted && <span className="sr-only" role="status">Favoritos temporales: no se guardarán al recargar esta página.</span>}
     </button>
   );
 }
