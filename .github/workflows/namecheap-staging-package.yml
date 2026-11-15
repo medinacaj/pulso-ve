@@ -61,6 +61,9 @@ jobs:
           npm run db:seed
       - name: Compile Next.js and prepare standalone cPanel folder
         run: npm run build:cpanel
+      - name: Embed exact Git commit and staging-only notice
+        run: |
+          printf 'PulsoVE STAGING - version GitHub: %s\nNo es una aprobacion de produccion.\n' "$GITHUB_SHA" > .next/standalone/BUILD_COMMIT.txt
       - name: Verify artifact does not include known build-time secrets
         run: node scripts/verify-cpanel-artifact.mjs
       - name: Smoke test the exact bundled server
