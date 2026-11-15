@@ -61,3 +61,25 @@ test('la indexación pública y la cabecera de proxy generan advertencias', () =
   assert.ok(result.warnings.some((line) => line.includes('Indexación')));
   assert.ok(result.warnings.some((line) => line.includes('proxy')));
 });
+
+test('cuentas públicas no se declaran listas sin token, proveedor y remitente', () => {
+  const off = validateNamecheapConfiguration({ ...base, PUBLIC_ACCOUNTS_ENABLED: 'false' }, '22.16.0');
+  assert.deepEqual(off.failures, []);
+  assert.ok(off.warnings.some((message) => message.includes('Cuentas ciudadanas deshabilitadas')));
+
+  const missing = validateNamecheapConfiguration({ ...base, PUBLIC_ACCOUNTS_ENABLED: 'true' }, '22.16.0');
+  assert.ok(missing.failures.some((message) => message.includes('ACCOUNT_TOKEN_SECRET')));
+  assert.ok(missing.failures.some((message) => message.includes('RESEND_API_KEY')));
+  assert.ok(missing.failures.some((message) => message.includes('ACCOUNT_MAIL_FROM')));
+
+  const valid = validateNamecheapConfiguration({
+    ...base,
+    PUBLIC_ACCOUNTS_ENABLED: 'true',
+    ACCOUNT_TOKEN_SECRET: 'A'.repeat(60),
+    RESEND_API_KEY: 're_FAKE_CI_ONLY_WILL_NOT_SEND_EMAIL',
+    ACCOUNT_MAIL_FROM: 'cuentas@example.org',
+  }, '22.16.0');
+  assert.deepEqual(valid.failures, []);
+  assert.ok(valid.warnings.some((message) => message.includes('SPF/DKIM/DMARC')));
+  assert.equal(JSON.stringify(valid).includes('FAKE_CI_ONLY'), false);
+});
