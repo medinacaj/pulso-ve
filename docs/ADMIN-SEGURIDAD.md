@@ -23,7 +23,7 @@
 
 ## Bloqueos de producción pendientes
 
-- **No existen todavía** registro público, verificaciones por correo, restablecimiento de contraseña, preferencias de cuenta, suscripciones operativas ni envío SMTP. Tampoco se envía correo al crear el administrador por CLI.
+- **Cuentas ciudadanas:** existe registro/verificación y recuperación opt-in sin activar ni validar con dominio de correo real (ver `docs/CUENTAS-EMAIL.md`). No existen todavía preferencias de cuenta, suscripciones operativas ni envío SMTP. El bootstrap administrativo por CLI no envía correo.
 - **Revocación:** el logout borra la cookie del navegador, pero no invalida el JWT previamente robado hasta expirar (máximo 15 min). La revocación persistente, gestión de sesiones y rotación de claves deben completarse antes de datos sensibles de usuarios.
 - **MFA:** TOTP global del único propietario, sin enrolamiento/autoservicio, códigos de recuperación ni auditoría de reuso. Para más administradores hacen falta secretos individuales cifrados y gestión MFA por usuario.
 - **Centro de Control:** dashboard de indicadores reales y módulo de moderación de comentarios (aprobar/rechazar, auditado en transacción). Permanecen pendientes los demás módulos, verificación de sesiones en hosting, auditoría de escalada de privilegios y recuperación.
