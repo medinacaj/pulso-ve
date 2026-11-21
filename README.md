@@ -367,3 +367,17 @@ del seed no implican monitorización técnica individual de cada proveedor.
 ## Seguridad de cambios de esquema
 
 `npm run db:migrate` utiliza `drizzle-kit push` **solo para una instancia local de desarrollo**: el ejecutor verifica un `DATABASE_URL` PostgreSQL hacia `localhost`/loopback y rechaza CI o entornos productivos. No lo utilice con túneles que redirijan un puerto local a una base real. Para staging o hosting se debe revisar y ensayar cada migración aditiva/versionada, respaldar y usar `npm run db:migrate:deploy` con credenciales temporales de migración separadas de las de ejecución. Las comprobaciones locales no sustituyen autorización ni pruebas de restauración productiva ([Issue #100](https://github.com/medinacaj/web-pulso-ve/issues/100)).
+
+## Continuidad y estado verificable · 21/11/2026
+
+**Propósito:** Plataforma de reportes, incidentes y catálogo de servicios en Venezuela.
+
+**Límite:** La demo y el catálogo no acreditan producción ni servicios operativos.
+
+- **Código:** consultar la rama principal efectiva, PR y commits recientes; mantener el alcance propio del producto.
+- **Validación:** revisar CI vinculada al SHA; esta edición documental no prueba funcionalidades.
+- **Entorno:** una demo, el código fusionado o un CI verde no demuestran producción. Verificar el sitio real cuando corresponda.
+- **Siguiente paso:** resolver el último bloqueo de los issues y registrar rama, PR, SHA, pruebas, entorno realmente verificado y pendientes.
+- **Privacidad:** no exponer secretos ni datos personales; conservar datos ficticios de prueba.
+
+**Documentos protegidos:** [memoria operativa](docs/MEMORIA_OPERATIVA.md) · [decisiones](docs/DECISIONES.md). [Issue #109](https://github.com/medinacaj/web-pulso-ve/issues/109).
