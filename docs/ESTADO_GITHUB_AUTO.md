@@ -1,13 +1,13 @@
 # Estado GitHub automático — medinacaj/web-pulso-ve
 
-**Consulta UTC:** 2026-11-24 20:55:00 UTC
+**Consulta UTC:** 2026-11-25 20:16:36 UTC
 
 > Solo metadatos GitHub. CI ≠ despliegue, demo ≠ producción, N/D ≠ éxito.
 > Archivo generado: no modificar decisiones, secretos ni registros manuales.
 
 ## Rama predeterminada
 - Rama: `main`
-- SHA: `12e6071acd8f2527d0f32aac04d4cf86c3823c7e`
+- SHA: `25c213f6cd82872207877bde027d7bfc6673cc28`
 
 ## PR abiertos
 - [#147](https://github.com/medinacaj/web-pulso-ve/pull/147) open | SHA `46a0c28084a76cea788530b7be6e6528a71a351e`
@@ -53,7 +53,8 @@
 - [#5](https://github.com/medinacaj/web-pulso-ve/issues/5)
 
 ## Últimas ejecuciones Actions
-- [45485669047](https://github.com/medinacaj/web-pulso-ve/actions/runs/45485669047) in_progress | SHA `12e6071acd8f2527d0f32aac04d4cf86c3823c7e`
+- [45693359189](https://github.com/medinacaj/web-pulso-ve/actions/runs/45693359189) in_progress | SHA `25c213f6cd82872207877bde027d7bfc6673cc28`
+- [45485669047](https://github.com/medinacaj/web-pulso-ve/actions/runs/45485669047) success | SHA `12e6071acd8f2527d0f32aac04d4cf86c3823c7e`
 - [45278233355](https://github.com/medinacaj/web-pulso-ve/actions/runs/45278233355) success | SHA `fc7ec49a5bf605387670b277b59f6abdd00812c1`
 - [45275541881](https://github.com/medinacaj/web-pulso-ve/actions/runs/45275541881) success | SHA `fc7ec49a5bf605387670b277b59f6abdd00812c1`
 - [45157591342](https://github.com/medinacaj/web-pulso-ve/actions/runs/45157591342) success | SHA `fc7ec49a5bf605387670b277b59f6abdd00812c1`
@@ -62,7 +63,6 @@
 - [44934794818](https://github.com/medinacaj/web-pulso-ve/actions/runs/44934794818) success | SHA `46a0c28084a76cea788530b7be6e6528a71a351e`
 - [44932121804](https://github.com/medinacaj/web-pulso-ve/actions/runs/44932121804) success | SHA `0d4be579b2d078a5c957273f05c5faba7e05d4a7`
 - [44814329109](https://github.com/medinacaj/web-pulso-ve/actions/runs/44814329109) success | SHA `11c89945d11447962b78924c1649fc9f0c83ed34`
-- [44814328972](https://github.com/medinacaj/web-pulso-ve/actions/runs/44814328972) success | SHA `11c89945d11447962b78924c1649fc9f0c83ed34`
 
 ## Estado del entorno
 - **N/D: despliegue no verificado por GitHub Actions.**
