@@ -1,13 +1,13 @@
 # Estado GitHub automático — medinacaj/pulso-ve
 
-**Consulta UTC:** 2026-11-26 19:54:30 UTC
+**Consulta UTC:** 2026-11-27 19:42:58 UTC
 
 > Solo metadatos GitHub. CI ≠ despliegue, demo ≠ producción, N/D ≠ éxito.
 > Archivo generado: no modificar decisiones, secretos ni registros manuales.
 
 ## Rama predeterminada
 - Rama: `main`
-- SHA: `eb1b39c143bdbe1275c18e33affb720dab46809c`
+- SHA: `ae77b1e714a4c84fdb24d96d53b2887ac71bf2e4`
 
 ## PR abiertos
 - [#147](https://github.com/medinacaj/pulso-ve/pull/147) open | SHA `46a0c28084a76cea788530b7be6e6528a71a351e`
@@ -53,7 +53,8 @@
 - [#5](https://github.com/medinacaj/pulso-ve/issues/5)
 
 ## Últimas ejecuciones Actions
-- [45887093485](https://github.com/medinacaj/pulso-ve/actions/runs/45887093485) in_progress | SHA `eb1b39c143bdbe1275c18e33affb720dab46809c`
+- [46058612566](https://github.com/medinacaj/pulso-ve/actions/runs/46058612566) in_progress | SHA `ae77b1e714a4c84fdb24d96d53b2887ac71bf2e4`
+- [45887093485](https://github.com/medinacaj/pulso-ve/actions/runs/45887093485) success | SHA `eb1b39c143bdbe1275c18e33affb720dab46809c`
 - [45838759911](https://github.com/medinacaj/pulso-ve/actions/runs/45838759911) success | SHA `86a6cc547ba00cf23ab07b87019dd7994577e369`
 - [45693359189](https://github.com/medinacaj/pulso-ve/actions/runs/45693359189) success | SHA `25c213f6cd82872207877bde027d7bfc6673cc28`
 - [45485669047](https://github.com/medinacaj/pulso-ve/actions/runs/45485669047) success | SHA `12e6071acd8f2527d0f32aac04d4cf86c3823c7e`
@@ -62,7 +63,6 @@
 - [45157591342](https://github.com/medinacaj/pulso-ve/actions/runs/45157591342) success | SHA `fc7ec49a5bf605387670b277b59f6abdd00812c1`
 - [45053264946](https://github.com/medinacaj/pulso-ve/actions/runs/45053264946) success | SHA `88812d326204f9eaad12374e19cd0853c628d3b8`
 - [44934794819](https://github.com/medinacaj/pulso-ve/actions/runs/44934794819) skipped | SHA `46a0c28084a76cea788530b7be6e6528a71a351e`
-- [44934794818](https://github.com/medinacaj/pulso-ve/actions/runs/44934794818) success | SHA `46a0c28084a76cea788530b7be6e6528a71a351e`
 
 ## Estado del entorno
 - **N/D: despliegue no verificado por GitHub Actions.**
