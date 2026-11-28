@@ -362,7 +362,8 @@ El catálogo y la aplicación Next.js comparten código y recursos de marca, per
 - **Vista previa estática de GitHub Pages**: genera 579 fichas demostrativas con gráficos ficticios claramente identificados y sin transmisión de reportes. Su aprobación en CI no confirma la publicación del bundle ni demuestra monitorización activa.
 - **Logos**: recursos locales con procedencia documentada y fallback tipográfico. Véase `docs/LOGOS_EMPRESAS.md`. No se deben sustituir recursos faltantes con logotipos inventados o de otras empresas.
 
-El `package-lock.json` revisado resuelve `next@16.4.1`, `zod@4.6.7`,
+El `package-lock.json` revisado resuelve `next@16.4.6` (actualizado el 28/11/2026: 16.4.1 tenía avisos
+moderados, GHSA-mfr8-8qww-v76h y otros, y `next build` se detenía con `SecurityFatalError`), `zod@4.6.7`,
 `sharp@0.35.5` y `source-map-js@1.2.2`. [La verificación de integración #43374657924](https://github.com/medinacaj/web-downdetector-ve/actions/runs/43374657924)
 ejecutó `npm audit --omit=dev --audit-level=high` con resultado
 `found 0 vulnerabilities` para ese build. El control programado de auditoría
