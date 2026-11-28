@@ -706,7 +706,7 @@ Cashea.
   `PUBLIC_INDEXABLE=true` añade `Sitemap:`. La no indexación la hace el `noindex` del
   layout, que Google solo puede leer si rastrea. Se quitó `/admin/` (no existía y no se
   anuncian rutas administrativas).
-- Pruebas: `tests/robots.test.ts` (3).
+- Pruebas: `tests/robots.test.ts` (3). Total: 245.
 - Verificado con `next dev` y agente Googlebot: las 18 páginas estáticas llevan
   `noindex` en el `<head>` (también las que redirigen: `/cuenta` y `/centro-control`), y
   un servicio inexistente da 404 con `noindex`. Con `SITE_URL=https://ejemplo.org` y
