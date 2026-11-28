@@ -23,6 +23,32 @@ export async function getCategories() {
   return db.select({ slug: categories.slug, name: categories.name }).from(categories).orderBy(asc(categories.sortOrder));
 }
 
+/** Categoría por slug (para /categorias/<slug>). `null` si no existe. */
+export async function getCategoryBySlug(
+  slug: string,
+): Promise<{ slug: string; name: string; description: string | null } | null> {
+  const [row] = await db
+    .select({ slug: categories.slug, name: categories.name, description: categories.description })
+    .from(categories)
+    .where(eq(categories.slug, slug))
+    .limit(1);
+  return row ?? null;
+}
+
+/**
+ * Slugs de las categorías con al menos un servicio activo, en el orden editorial.
+ * Una categoría vacía no tiene página (daría una página sin contenido) ni entra en el
+ * sitemap ni en los enlaces internos.
+ */
+export async function getCategoriesWithActiveServices() {
+  return db
+    .select({ slug: categories.slug, name: categories.name, total: sql<number>`count(${services.id})::int` })
+    .from(categories)
+    .innerJoin(services, and(eq(services.categoryId, categories.id), eq(services.active, true)))
+    .groupBy(categories.id)
+    .orderBy(asc(categories.sortOrder));
+}
+
 export async function getDirectoryServices(params: {
   q?: string;
   category?: string;

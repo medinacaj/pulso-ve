@@ -661,3 +661,21 @@ Cashea.
 - `.gitignore`: `CLAUDE.local.md` y `.claude/settings.local.json`.
 - **No verificado:** `npm run build` (Google Fonts bloqueado en el entorno); el
   bootstrap fuera de Linux; nada del SEO contra un dominio real.
+
+### Páginas de categoría — 2026-11-28
+
+- `/categorias/<slug>` (`src/app/categorias/[slug]/page.tsx`), portada de la rama
+  `seo/base-indexacion` (PR #19, cerrado) adaptada al código actual: título y
+  descripción propios (la descripción sale de la semilla; en apuestas y loterías
+  se garantiza el aviso de no promoción), canonical, servicios de la categoría y
+  enlaces a las demás. Categoría inexistente o sin servicios activos → 404.
+- Sitemap: añade las categorías con servicios activos (`getCategoriesWithActiveServices`).
+- Enlaces internos rastreables: fila «Explorar por categoría» en `/servicios`
+  (desplazable en móvil) y la categoría en la miga de pan de cada servicio.
+- Corregido el título de `/servicios/<slug>`: salía «… | PulsoVE | PulsoVE».
+- Pruebas: `tests/category-pages.test.ts` (6, sin base de datos). Total: 237.
+- Verificado con `next dev`: 18 categorías → 200; inexistente → 404; sitemap con
+  indexación de prueba (`https://ejemplo.org`) → 18 URLs de categoría, todas 200;
+  recorrido servicios → categoría → servicio en Chromium de escritorio y móvil sin
+  errores de consola ni desbordamiento horizontal.
+- **No verificado:** dominio real, Search Console, `next build` en local (lo cubre la CI).
