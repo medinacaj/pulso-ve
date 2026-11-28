@@ -221,7 +221,7 @@ export default function MethodologyPage() {
         </div>
         <div className="rounded-2xl bg-surface p-6 shadow-sm">
           <h2 className="font-display text-xl font-semibold">Ubicación, privacidad y límites</h2>
-          <p className="mt-4 text-sm leading-7 text-ink-muted">La región se elige al enviar el reporte. PulsoVE no necesita publicar coordenadas, direcciones ni la posición exacta del usuario. Las identidades se tratan mediante identificadores anónimos y se limita la frecuencia de envío.</p>
+          <p className="mt-4 text-sm leading-7 text-ink-muted">La región se elige al enviar el reporte. Si el proveedor que aloja el sitio informa el estado aproximado de la conexión, el formulario puede preseleccionarlo; no se guarda aparte y se puede cambiar. PulsoVE no necesita publicar coordenadas, direcciones ni la posición exacta del usuario. Las identidades se tratan mediante identificadores anónimos y se limita la frecuencia de envío.</p>
           <p className="mt-3 text-sm leading-7 text-ink-muted">Los duplicados sospechosos pueden conservarse para auditoría y recibir menor peso; no prometemos que todos los duplicados desaparezcan de cada contador público. Los reportes también dependen de quiénes participan y de su conectividad.</p>
           <p className="mt-3 text-sm leading-7 text-ink-muted">Las comprobaciones técnicas automatizadas generales y los comunicados empresariales no se presumen activos sin una fuente realmente conectada. La periodicidad de procesamiento depende de la ejecución configurada del motor, no de un intervalo de actualización garantizado.</p>
         </div>
