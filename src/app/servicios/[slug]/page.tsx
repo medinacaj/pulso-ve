@@ -12,6 +12,7 @@ import { TechnicalHistoryChart } from '@/components/service/TechnicalHistoryChar
 import { TopIssuesBreakdown } from '@/components/service/TopIssuesBreakdown';
 import { ServiceComments } from '@/components/service/ServiceComments';
 import { getServiceProfile } from '@/lib/catalog/service-profiles';
+import { getTurnstileSiteKey } from '@/lib/security/turnstile';
 import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
 import { getEngineFreshness } from '@/lib/queries/engine';
 import { categoryHref } from '@/lib/nav';
@@ -182,6 +183,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             issueTypes={issueTypeOptions}
             states={allStates}
             suggestedStateCode={suggestStateCode(await headers(), new Set(allStates.map((s) => s.code)))}
+            turnstileSiteKey={getTurnstileSiteKey()}
           />
         </div>
       </section>

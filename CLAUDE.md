@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 259 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 271 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo

@@ -727,3 +727,20 @@ Cashea.
   responde `never`. Tras `aggregate:run`, el aviso desaparece y la salud responde `ok`.
   En Chromium móvil, la categoría no tiene errores de consola ni desbordamiento.
 - **No verificado:** cron real en Namecheap.
+
+### Cloudflare Turnstile en el formulario de reporte — 2026-11-28 (PR #150)
+
+- Turnstile en `ReportForm` y verificación en `POST /api/reports`, **desactivado por
+  defecto** (`ENABLE_TURNSTILE=false`). Activado sin claves, el envío falla de forma
+  explícita. El detalle está en el README y en `.env.example`.
+- Al integrarlo tras #149–#153, `ReportForm` recibe tanto `turnstileSiteKey` como
+  `suggestedStateCode`.
+- Pruebas: 271 en total.
+- Verificado con `next dev` y Chromium (iPhone 13):
+  - **Desactivado** (con `GEO_HINT_HEADERS=cloudflare`): Miranda preseleccionada, el
+    `POST` responde 201, sin token y sin ninguna petición a Cloudflare.
+  - **Activado con las claves de prueba públicas de Cloudflare:** un `POST` sin token
+    devuelve `verification_failed` y el botón sigue deshabilitado sin token.
+- **No verificado:** el widget y la verificación real con Cloudflare. El sandbox bloquea
+  `challenges.cloudflare.com` (`ERR_TUNNEL_CONNECTION_FAILED`). Hay que probarlo en el
+  hosting con claves reales antes de activarlo.
