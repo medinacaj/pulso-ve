@@ -1,19 +1,21 @@
 # Estado GitHub automático — medinacaj/pulso-ve
 
-**Consulta UTC:** 2026-11-28 09:15:57 UTC
+**Consulta UTC:** 2026-11-28 10:16:21 UTC
 
 > Solo metadatos GitHub. CI ≠ despliegue, demo ≠ producción, N/D ≠ éxito.
 > Archivo generado: no modificar decisiones, secretos ni registros manuales.
 
 ## Rama predeterminada
 - Rama: `main`
-- SHA: `523354fa10036a833d128a3beb40f3afb16a0942`
+- SHA: `1951f101c434e014a3aef2798260a06d41f3c215`
 
 ## PR abiertos
+- [#153](https://github.com/medinacaj/pulso-ve/pull/153) open | SHA `93e1bf69a0f4d829a9d6f124fcd59e961e065fdb`
+- [#152](https://github.com/medinacaj/pulso-ve/pull/152) open | SHA `8cca0310da47d13b86cf4445d03f7ba19b65d790`
 - [#150](https://github.com/medinacaj/pulso-ve/pull/150) open | SHA `6d4163edb778dd69447e652b8d28d243c65bf8f1`
 - [#149](https://github.com/medinacaj/pulso-ve/pull/149) open | SHA `676a963e2cedaff0375c3f46f8c19d07b5474cf5`
 - [#147](https://github.com/medinacaj/pulso-ve/pull/147) open | SHA `46a0c28084a76cea788530b7be6e6528a71a351e`
-- [#144](https://github.com/medinacaj/pulso-ve/pull/144) open | SHA `bef8a4c6431a2d5f95265d1f50e5326c07ec5415`
+- [#144](https://github.com/medinacaj/pulso-ve/pull/144) open | SHA `2ccc241b26550a7fe0efff3e360ece0dfdfe8a4c`
 - [#143](https://github.com/medinacaj/pulso-ve/pull/143) open | SHA `f9dfa26a6385be59336f3ade370bfd65e746591c`
 - [#142](https://github.com/medinacaj/pulso-ve/pull/142) open | SHA `0fce7f1eb2976b792c04ffc226575a0f0ea62512`
 - [#141](https://github.com/medinacaj/pulso-ve/pull/141) draft | SHA `361a45a97db53355a721fbbe5a6aaf9972353232`
@@ -54,16 +56,16 @@
 - [#5](https://github.com/medinacaj/pulso-ve/issues/5)
 
 ## Últimas ejecuciones Actions
-- [46129641481](https://github.com/medinacaj/pulso-ve/actions/runs/46129641481) pending | SHA `803f8582d1462ca4bd58668c5b2e1c279777bb97`
-- [46129640953](https://github.com/medinacaj/pulso-ve/actions/runs/46129640953) in_progress | SHA `523354fa10036a833d128a3beb40f3afb16a0942`
-- [46129640936](https://github.com/medinacaj/pulso-ve/actions/runs/46129640936) in_progress | SHA `523354fa10036a833d128a3beb40f3afb16a0942`
-- [46129640903](https://github.com/medinacaj/pulso-ve/actions/runs/46129640903) in_progress | SHA `523354fa10036a833d128a3beb40f3afb16a0942`
-- [46129640887](https://github.com/medinacaj/pulso-ve/actions/runs/46129640887) in_progress | SHA `523354fa10036a833d128a3beb40f3afb16a0942`
-- [46128862689](https://github.com/medinacaj/pulso-ve/actions/runs/46128862689) success | SHA `6d4163edb778dd69447e652b8d28d243c65bf8f1`
-- [46128862687](https://github.com/medinacaj/pulso-ve/actions/runs/46128862687) success | SHA `6d4163edb778dd69447e652b8d28d243c65bf8f1`
-- [46128862656](https://github.com/medinacaj/pulso-ve/actions/runs/46128862656) success | SHA `6d4163edb778dd69447e652b8d28d243c65bf8f1`
-- [46128862653](https://github.com/medinacaj/pulso-ve/actions/runs/46128862653) skipped | SHA `6d4163edb778dd69447e652b8d28d243c65bf8f1`
-- [46128862649](https://github.com/medinacaj/pulso-ve/actions/runs/46128862649) success | SHA `6d4163edb778dd69447e652b8d28d243c65bf8f1`
+- [46134367578](https://github.com/medinacaj/pulso-ve/actions/runs/46134367578) pending | SHA `dfc06bb64f6a70b77c18d7dec90edaeeffefb2af`
+- [46134367446](https://github.com/medinacaj/pulso-ve/actions/runs/46134367446) in_progress | SHA `1951f101c434e014a3aef2798260a06d41f3c215`
+- [46134367439](https://github.com/medinacaj/pulso-ve/actions/runs/46134367439) in_progress | SHA `1951f101c434e014a3aef2798260a06d41f3c215`
+- [46134367437](https://github.com/medinacaj/pulso-ve/actions/runs/46134367437) in_progress | SHA `1951f101c434e014a3aef2798260a06d41f3c215`
+- [46134367386](https://github.com/medinacaj/pulso-ve/actions/runs/46134367386) in_progress | SHA `1951f101c434e014a3aef2798260a06d41f3c215`
+- [46130887352](https://github.com/medinacaj/pulso-ve/actions/runs/46130887352) success | SHA `93e1bf69a0f4d829a9d6f124fcd59e961e065fdb`
+- [46130887341](https://github.com/medinacaj/pulso-ve/actions/runs/46130887341) skipped | SHA `93e1bf69a0f4d829a9d6f124fcd59e961e065fdb`
+- [46130508576](https://github.com/medinacaj/pulso-ve/actions/runs/46130508576) skipped | SHA `8cca0310da47d13b86cf4445d03f7ba19b65d790`
+- [46130508570](https://github.com/medinacaj/pulso-ve/actions/runs/46130508570) success | SHA `8cca0310da47d13b86cf4445d03f7ba19b65d790`
+- [46130508561](https://github.com/medinacaj/pulso-ve/actions/runs/46130508561) success | SHA `8cca0310da47d13b86cf4445d03f7ba19b65d790`
 
 ## Estado del entorno
 - **N/D: despliegue no verificado por GitHub Actions.**
