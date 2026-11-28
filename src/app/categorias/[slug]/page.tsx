@@ -5,6 +5,8 @@ import { getCategoriesWithActiveServices, getCategoryBySlug, getDirectoryService
 import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import { ROUTE, categoryHref } from '@/lib/nav';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 // Datos en vivo (estado y reportes): se renderiza en cada petición.
 export const dynamic = 'force-dynamic';
@@ -51,10 +53,12 @@ export default async function CategoryPage({ params }: { params: Params }) {
   const data = await loadCategory(slug);
   if (!data) notFound();
   const { category, services, total } = data;
-  const otherCategories = (await getCategoriesWithActiveServices()).filter((c) => c.slug !== category.slug);
+  const [allCategories, freshness] = await Promise.all([getCategoriesWithActiveServices(), getEngineFreshness()]);
+  const otherCategories = allCategories.filter((c) => c.slug !== category.slug);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} className="mb-5" />
       <nav aria-label="Ruta de navegación" className="mb-5 text-sm text-ink-muted">
         <Link href={ROUTE.services.href} className="underline underline-offset-2 hover:text-ink">
           Todos los servicios

@@ -713,3 +713,17 @@ Cashea.
   `PUBLIC_INDEXABLE=true`: `robots.txt` añade `Sitemap:` y las páginas públicas pasan a
   `index, follow`, mientras el Centro de Control sigue con `noindex`.
 - **No verificado:** dominio real, caché del hosting y Search Console.
+
+### Motor: ventanas cerradas y aviso de datos desactualizados — 2026-11-28 (PR #149)
+
+- El motor procesa solo periodos cerrados, recupera hasta 8 pendientes y añade
+  `/api/health/engine` y la migración `0003` (índices de `aggregated_windows`). El
+  detalle está en el README.
+- Al integrarlo tras #151–#153, el aviso «Datos desactualizados» / «Sin análisis
+  todavía» se añadió también a `/categorias/<slug>`.
+- Pruebas: 259 en total.
+- Verificado con `next dev`: sin ejecuciones del motor, el aviso aparece en la portada,
+  `/servicios`, `/servicios/netflix` y `/categorias/streaming`, y `/api/health/engine`
+  responde `never`. Tras `aggregate:run`, el aviso desaparece y la salud responde `ok`.
+  En Chromium móvil, la categoría no tiene errores de consola ni desbordamiento.
+- **No verificado:** cron real en Namecheap.

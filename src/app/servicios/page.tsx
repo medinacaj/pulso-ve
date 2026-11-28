@@ -6,6 +6,8 @@ import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import { HomeAutoRefresh } from '@/components/home/HomeAutoRefresh';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,8 +46,11 @@ export default async function ServicesDirectoryPage({
     getCategoriesWithActiveServices(),
   ]);
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} />
       {(!validSort || validSort === 'activity') && <HomeAutoRefresh />}
       <div className="flex items-baseline justify-between gap-4">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Servicios</h1>

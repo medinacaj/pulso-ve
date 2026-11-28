@@ -33,7 +33,7 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 245 pruebas automatizadas (datos semilla y calidad del catálogo, registro
+- 259 pruebas automatizadas (datos semilla y calidad del catálogo, registro
   de rutas de navegación, privacidad, bandas de estado, integración real de
   `POST /api/reports`, estadística robusta del motor, combinación ponderada
   de señales).
@@ -100,12 +100,22 @@ Se añadió un runner de una sola ejecución: `npm run monitor:run`. Solo se act
 ## El motor de anomalías
 
 ```bash
-npm run aggregate:run -- --window=15 --at=2026-10-01T13:00:00Z
+npm run aggregate:run                                          # modo cron
+npm run aggregate:run -- --window=15 --at=2026-10-01T13:00:00Z # una ventana concreta
 ```
-Agrega la ventana indicada (todos los servicios activos), recalcula líneas
-base, puntúa anomalías y actualiza incidentes. Sin `--at`, usa el momento
-actual; sin `--window`, 15 minutos. Pensado para correr periódicamente
-(cron externo) — este proyecto no incluye scheduler propio todavía.
+Agrega (todos los servicios activos), recalcula líneas base, puntúa anomalías
+y actualiza incidentes. **Sin `--at` (modo cron)** procesa solo ventanas
+**cerradas**: las pendientes desde la última procesada, en orden y como mucho 8
+(2 h), así que una ejecución perdida no deja huecos (el ciclo de incidentes
+exige ventanas consecutivas) y una ventana en curso nunca se agrega a medias.
+Repetirlo sin ventanas pendientes no hace nada, así que el cron puede ir cada
+5 minutos. Con `--at` procesa exactamente la ventana que contiene esa fecha.
+El proyecto no programa el cron: ver `docs/DESPLIEGUE-NAMECHEAP.md`.
+
+Si el motor lleva `ENGINE_FRESHNESS_SECONDS` (3600 por defecto) sin ejecutarse,
+inicio, directorio, servicio, incidentes y estadísticas avisan «Datos
+desactualizados» («Sin análisis todavía» si nunca se ejecutó), y
+`GET /api/health/engine` responde 503 (200 solo con un ciclo reciente).
 
 Para ver el ciclo completo (línea base → anomalía → incidente → resolución)
 sin esperar tráfico real:
@@ -206,14 +216,14 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (245 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (259 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
 | `npm run db:seed` | Carga los datos semilla (idempotente): sincroniza categorías y tipos de problema; inserta los estados y servicios que falten |
 | `npm run db:studio` | Explorador visual de la base de datos |
 | `npm run create-admin` | Bootstrap de **un único administrador de staging**, requiere secretos privados, TOTP y PostgreSQL; no se ejecuta automáticamente. Ver `docs/ADMIN-SEGURIDAD.md`. |
-| `npm run aggregate:run -- [--window=N] [--at=ISO]` | Un ciclo del motor: agregación + línea base + anomalías + incidentes |
+| `npm run aggregate:run -- [--window=N] [--at=ISO]` | Motor: sin `--at`, ventanas cerradas pendientes (modo cron); con `--at`, esa ventana |
 | `npm run dev:synthetic-traffic -- [--cleanup]` | Genera/limpia tráfico sintético para probar el motor (ver sección dedicada) |
 
 ## Variables de entorno
