@@ -33,7 +33,7 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 237 pruebas automatizadas (datos semilla y calidad del catálogo, registro
+- 242 pruebas automatizadas (datos semilla y calidad del catálogo, registro
   de rutas de navegación, privacidad, bandas de estado, integración real de
   `POST /api/reports`, estadística robusta del motor, combinación ponderada
   de señales).
@@ -50,7 +50,10 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
 - **Página de servicio con reporte funcional** (`/servicios/:slug`):
   estado real, confianza, desglose de problemas, actividad geográfica,
   incidentes recientes — y un formulario de reporte que de verdad
-  funciona (sin Turnstile ni geolocalización todavía, eso es la Etapa 5).
+  funciona. El estado se elige siempre a mano; si `GEO_HINT_HEADERS`
+  (`cloudflare` o `vercel`) está configurado, se preselecciona el que informa
+  el proveedor delante del sitio (sin coordenadas, sin guardarlo aparte). Sin
+  esa variable, o en Namecheap sin Cloudflare delante, no hay sugerencia.
 
 ## Endpoints disponibles
 
@@ -203,7 +206,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (237 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (242 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |

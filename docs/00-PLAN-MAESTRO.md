@@ -679,3 +679,22 @@ Cashea.
   recorrido servicios → categoría → servicio en Chromium de escritorio y móvil sin
   errores de consola ni desbordamiento horizontal.
 - **No verificado:** dominio real, Search Console, `next build` en local (lo cubre la CI).
+
+### Estado sugerido en el formulario de reporte — 2026-11-28
+
+- `src/lib/geo.ts`: sugiere el estado a partir de las cabeceras de ubicación del
+  proveedor que está delante del sitio (`cf-ipcountry` + `cf-region-code` o
+  `x-vercel-ip-country` + `x-vercel-ip-country-region`). Portado de la rama
+  `seo/base-indexacion`, con un cambio: **desactivado por defecto** y activable con
+  `GEO_HINT_HEADERS=cloudflare|vercel`, como `TRUSTED_CLIENT_IP_HEADER`.
+- `ReportForm`: preselecciona el estado sugerido con la pista «Sugerido según tu
+  conexión. Cámbialo si no es correcto.». Sin sugerencia aparece «Elige tu estado…»
+  y hay que elegir. Antes quedaba preseleccionado Amazonas, el primero de la lista,
+  y quien no lo cambiaba lo reportaba sin querer.
+- Metodología: lo explica. No se guardan coordenadas ni la sugerencia aparte.
+- Pruebas: `tests/geo.test.ts` (5). Total: 242.
+- Verificado con `next dev` y Chromium (iPhone 13): con `GEO_HINT_HEADERS=cloudflare`
+  y cabeceras `VE`/`M`, Miranda queda preseleccionada y el `POST /api/reports` envía
+  `VE-M`; sin cabeceras o con otro país no se puede enviar sin elegir; con la
+  configuración por defecto se ignoran las cabeceras y la elección manual se envía.
+- **No verificado:** Cloudflare o Vercel reales (no hay despliegue con ellos).
