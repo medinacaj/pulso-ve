@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { getServiceBySlug } from '@/lib/queries/services';
@@ -12,6 +13,10 @@ import { TopIssuesBreakdown } from '@/components/service/TopIssuesBreakdown';
 import { ServiceComments } from '@/components/service/ServiceComments';
 import { getServiceProfile } from '@/lib/catalog/service-profiles';
 import { getTurnstileSiteKey } from '@/lib/security/turnstile';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
+import { categoryHref } from '@/lib/nav';
+import { suggestStateCode } from '@/lib/geo';
 
 function formatDateTime(date: Date | null) {
   if (!date) return null;
@@ -40,7 +45,8 @@ export async function generateMetadata({
   const service = await getServiceBySlug(slug);
   if (!service || !service.active) return { title: 'Servicio no encontrado' };
   return {
-    title: `Reportes de ${service.name} | PulsoVE`,
+    // El layout añade « | PulsoVE » (antes salía duplicado).
+    title: `Reportes de ${service.name}`,
     alternates: { canonical: `/servicios/${encodeURIComponent(service.slug)}` },
     description: `${service.name}: ${service.description || service.category.name}. Consulta reportes e incidentes registrados, sin confundirlos con disponibilidad confirmada.`,
   };
@@ -54,11 +60,16 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history, approvedComments } = data;
   const profile = getServiceProfile({slug: service.slug, name: service.name, categorySlug: service.category.slug, categoryName: service.category.name, description: service.description});
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} className="mb-5" />
       {/* Ficha editorial y estado, independientes de las mediciones. */}
       <nav aria-label="Ruta de navegación" className="mb-5 text-sm text-ink-muted">
         <Link href="/servicios" className="underline underline-offset-2 hover:text-ink">Todos los servicios</Link>
+        <span aria-hidden="true" className="px-2">/</span>
+        <Link href={categoryHref(service.category.slug)} className="underline underline-offset-2 hover:text-ink">{service.category.name}</Link>
         <span aria-hidden="true" className="px-2">/</span>{service.name}
       </nav>
       <header className="service-detail-panel rounded-xl border border-border bg-surface p-5 sm:p-7">
@@ -167,7 +178,13 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         <h2 id="reportar-title" className="font-display text-lg font-semibold">Reportar una falla de {service.name}</h2>
         <p className="mt-1 text-sm text-ink-muted">Selecciona el problema y tu estado, acepta la declaración y envía. Puedes añadir detalles opcionales.</p>
         <div className="mt-4">
-          <ReportForm serviceSlug={service.slug} issueTypes={issueTypeOptions} states={allStates} turnstileSiteKey={getTurnstileSiteKey()} />
+          <ReportForm
+            serviceSlug={service.slug}
+            issueTypes={issueTypeOptions}
+            states={allStates}
+            suggestedStateCode={suggestStateCode(await headers(), new Set(allStates.map((s) => s.code)))}
+            turnstileSiteKey={getTurnstileSiteKey()}
+          />
         </div>
       </section>
 

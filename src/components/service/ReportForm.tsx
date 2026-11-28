@@ -28,12 +28,15 @@ export function ReportForm({
   issueTypes,
   states,
   turnstileSiteKey = null,
+  suggestedStateCode = null,
 }: {
   serviceSlug: string;
   issueTypes: Option[];
   states: Option[];
   /** Clave pública de Turnstile; null = desactivado (no se carga nada de Cloudflare). */
   turnstileSiteKey?: string | null;
+  /** Estado sugerido por la conexión (src/lib/geo.ts); la persona puede cambiarlo. */
+  suggestedStateCode?: string | null;
 }) {
   const formId = useId();
   const [state, setState] = useState<SubmitState>({ kind: 'idle' });
@@ -128,14 +131,25 @@ export function ReportForm({
             id={`${formId}-state`}
             name="stateCode"
             required
+            defaultValue={suggestedStateCode ?? ''}
+            aria-describedby={suggestedStateCode ? `${formId}-state-hint` : undefined}
             className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
           >
+            {/* Sin sugerencia hay que elegir: antes quedaba preseleccionado el primero (Amazonas). */}
+            <option value="" disabled>
+              Elige tu estado…
+            </option>
             {states.map((o) => (
               <option key={o.code} value={o.code}>
                 {o.name}
               </option>
             ))}
           </select>
+          {suggestedStateCode && (
+            <p id={`${formId}-state-hint`} className="mt-1 text-xs text-ink-muted">
+              Sugerido según tu conexión. Cámbialo si no es correcto.
+            </p>
+          )}
         </div>
 
       </div>

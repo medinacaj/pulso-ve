@@ -661,3 +661,86 @@ Cashea.
 - `.gitignore`: `CLAUDE.local.md` y `.claude/settings.local.json`.
 - **No verificado:** `npm run build` (Google Fonts bloqueado en el entorno); el
   bootstrap fuera de Linux; nada del SEO contra un dominio real.
+
+### Páginas de categoría — 2026-11-28
+
+- `/categorias/<slug>` (`src/app/categorias/[slug]/page.tsx`), portada de la rama
+  `seo/base-indexacion` (PR #19, cerrado) adaptada al código actual: título y
+  descripción propios (la descripción sale de la semilla; en apuestas y loterías
+  se garantiza el aviso de no promoción), canonical, servicios de la categoría y
+  enlaces a las demás. Categoría inexistente o sin servicios activos → 404.
+- Sitemap: añade las categorías con servicios activos (`getCategoriesWithActiveServices`).
+- Enlaces internos rastreables: fila «Explorar por categoría» en `/servicios`
+  (desplazable en móvil) y la categoría en la miga de pan de cada servicio.
+- Corregido el título de `/servicios/<slug>`: salía «… | PulsoVE | PulsoVE».
+- Pruebas: `tests/category-pages.test.ts` (6, sin base de datos). Total: 237.
+- Verificado con `next dev`: 18 categorías → 200; inexistente → 404; sitemap con
+  indexación de prueba (`https://ejemplo.org`) → 18 URLs de categoría, todas 200;
+  recorrido servicios → categoría → servicio en Chromium de escritorio y móvil sin
+  errores de consola ni desbordamiento horizontal.
+- **No verificado:** dominio real, Search Console, `next build` en local (lo cubre la CI).
+
+### Estado sugerido en el formulario de reporte — 2026-11-28
+
+- `src/lib/geo.ts`: sugiere el estado a partir de las cabeceras de ubicación del
+  proveedor que está delante del sitio (`cf-ipcountry` + `cf-region-code` o
+  `x-vercel-ip-country` + `x-vercel-ip-country-region`). Portado de la rama
+  `seo/base-indexacion`, con un cambio: **desactivado por defecto** y activable con
+  `GEO_HINT_HEADERS=cloudflare|vercel`, como `TRUSTED_CLIENT_IP_HEADER`.
+- `ReportForm`: preselecciona el estado sugerido con la pista «Sugerido según tu
+  conexión. Cámbialo si no es correcto.». Sin sugerencia aparece «Elige tu estado…»
+  y hay que elegir. Antes quedaba preseleccionado Amazonas, el primero de la lista,
+  y quien no lo cambiaba lo reportaba sin querer.
+- Metodología: lo explica. No se guardan coordenadas ni la sugerencia aparte.
+- Pruebas: `tests/geo.test.ts` (5). Total: 242.
+- Verificado con `next dev` y Chromium (iPhone 13): con `GEO_HINT_HEADERS=cloudflare`
+  y cabeceras `VE`/`M`, Miranda queda preseleccionada y el `POST /api/reports` envía
+  `VE-M`; sin cabeceras o con otro país no se puede enviar sin elegir; con la
+  configuración por defecto se ignoran las cabeceras y la elección manual se envía.
+- **No verificado:** Cloudflare o Vercel reales (no hay despliegue con ellos).
+
+### robots.txt: rastreo permitido con noindex — 2026-11-28
+
+- Decisión de la persona propietaria: `robots.txt` ya no responde `Disallow: /` mientras
+  el sitio no se indexa. Siempre `Allow: /` y `Disallow: /api/`; con
+  `PUBLIC_INDEXABLE=true` añade `Sitemap:`. La no indexación la hace el `noindex` del
+  layout, que Google solo puede leer si rastrea. Se quitó `/admin/` (no existía y no se
+  anuncian rutas administrativas).
+- Pruebas: `tests/robots.test.ts` (3). Total: 245.
+- Verificado con `next dev` y agente Googlebot: las 18 páginas estáticas llevan
+  `noindex` en el `<head>` (también las que redirigen: `/cuenta` y `/centro-control`), y
+  un servicio inexistente da 404 con `noindex`. Con `SITE_URL=https://ejemplo.org` y
+  `PUBLIC_INDEXABLE=true`: `robots.txt` añade `Sitemap:` y las páginas públicas pasan a
+  `index, follow`, mientras el Centro de Control sigue con `noindex`.
+- **No verificado:** dominio real, caché del hosting y Search Console.
+
+### Motor: ventanas cerradas y aviso de datos desactualizados — 2026-11-28 (PR #149)
+
+- El motor procesa solo periodos cerrados, recupera hasta 8 pendientes y añade
+  `/api/health/engine` y la migración `0003` (índices de `aggregated_windows`). El
+  detalle está en el README.
+- Al integrarlo tras #151–#153, el aviso «Datos desactualizados» / «Sin análisis
+  todavía» se añadió también a `/categorias/<slug>`.
+- Pruebas: 259 en total.
+- Verificado con `next dev`: sin ejecuciones del motor, el aviso aparece en la portada,
+  `/servicios`, `/servicios/netflix` y `/categorias/streaming`, y `/api/health/engine`
+  responde `never`. Tras `aggregate:run`, el aviso desaparece y la salud responde `ok`.
+  En Chromium móvil, la categoría no tiene errores de consola ni desbordamiento.
+- **No verificado:** cron real en Namecheap.
+
+### Cloudflare Turnstile en el formulario de reporte — 2026-11-28 (PR #150)
+
+- Turnstile en `ReportForm` y verificación en `POST /api/reports`, **desactivado por
+  defecto** (`ENABLE_TURNSTILE=false`). Activado sin claves, el envío falla de forma
+  explícita. El detalle está en el README y en `.env.example`.
+- Al integrarlo tras #149–#153, `ReportForm` recibe tanto `turnstileSiteKey` como
+  `suggestedStateCode`.
+- Pruebas: 271 en total.
+- Verificado con `next dev` y Chromium (iPhone 13):
+  - **Desactivado** (con `GEO_HINT_HEADERS=cloudflare`): Miranda preseleccionada, el
+    `POST` responde 201, sin token y sin ninguna petición a Cloudflare.
+  - **Activado con las claves de prueba públicas de Cloudflare:** un `POST` sin token
+    devuelve `verification_failed` y el botón sigue deshabilitado sin token.
+- **No verificado:** el widget y la verificación real con Cloudflare. El sandbox bloquea
+  `challenges.cloudflare.com` (`ERR_TUNNEL_CONNECTION_FAILED`). Hay que probarlo en el
+  hosting con claves reales antes de activarlo.

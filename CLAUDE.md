@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 66 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 271 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -154,8 +154,7 @@ vulnerabilidades solo de herramientas de desarrollo (vitest/vite/esbuild).
 
 Brechas conocidas: señales técnica y oficial del motor sin fuente real (se excluyen y el
 resto se renormaliza); municipios sin sembrar; el directorio hace una consulta de estado
-por servicio (N+1; ~0,15 s con 71 servicios en local); sin páginas de categoría
-indexables (solo el filtro `?category=`); el SEO no se probó contra un dominio real ni en
+por servicio (N+1); el SEO no se probó contra un dominio real ni en
 Google Search Console (no se usó); revisión legal profesional de apuestas y loterías
 pendiente; `npm run build` sin verificar en el sandbox.
 
