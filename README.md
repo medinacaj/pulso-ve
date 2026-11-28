@@ -343,6 +343,7 @@ Nunca guardar `DATABASE_URL` ni `ANONYMIZATION_SALT` de producción en Git o en 
 - Para operar en varias instancias, configurar Redis. Si Redis está configurado pero se pierde, la recepción de reportes falla de forma restrictiva: **no se degrada a contadores aislados por proceso**. Solo una instalación de una instancia puede utilizar el límite en memoria.
 - El límite por red puede afectar a usuarios legítimos que comparten NAT; se debe ajustar con métricas anonimizadas y pruebas autorizadas. Sin proxy verificado, la cuota por red permanece sin activar y ese riesgo debe constar en el despliegue.
 - `npm run test:unit` comprueba la procedencia de IP, normalización y cuota. Antes del lanzamiento quedan pendientes despliegue real, abuso distribuido y pruebas de privacidad por un responsable.
+- **Cloudflare Turnstile (28-11-2026), desactivado por defecto.** Con `ENABLE_TURNSTILE="true"` y las dos claves, el formulario de reporte muestra el widget y `POST /api/reports` valida el token con Cloudflare antes de tocar la base. Falla cerrada: sin claves o sin respuesta de Cloudflare responde 503; token ausente o rechazado, 400 `verification_failed`. No se envía la IP a Cloudflare y el token no se guarda. Desactivado, la página no carga nada de Cloudflare. Probado con `fetch` simulado y en el navegador sin acceso a Cloudflare (el envío queda bloqueado); **no** probado contra Cloudflare real. Los comentarios y el registro de cuentas aún no lo usan.
 
 ## Estado verificado del código y publicación · 13 de noviembre de 2026
 
