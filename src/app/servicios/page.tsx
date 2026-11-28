@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { getDirectoryServices, getCategories, type DirectorySort } from '@/lib/queries/directory';
+import Link from 'next/link';
+import { getDirectoryServices, getCategories, getCategoriesWithActiveServices, type DirectorySort } from '@/lib/queries/directory';
+import { categoryHref } from '@/lib/nav';
 import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import { HomeAutoRefresh } from '@/components/home/HomeAutoRefresh';
@@ -36,9 +38,10 @@ export default async function ServicesDirectoryPage({
   const validStatus = STATUS_OPTIONS.find((o) => o.value === params.status)?.value;
   const validSort = SORT_OPTIONS.find((o) => o.value === params.sort)?.value;
 
-  const [{ services, total }, categoryList] = await Promise.all([
+  const [{ services, total }, categoryList, browsableCategories] = await Promise.all([
     getDirectoryServices({ q: params.q, category: params.category, status: validStatus, sort: validSort }),
     getCategories(),
+    getCategoriesWithActiveServices(),
   ]);
 
   return (
@@ -122,6 +125,25 @@ export default async function ServicesDirectoryPage({
           Filtrar
         </button>
       </form>
+
+      {/* Enlaces HTML rastreables a cada categoría (el filtro ?category= no se indexa). */}
+      <nav aria-labelledby="explorar-categorias" className="mt-6">
+        <h2 id="explorar-categorias" className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+          Explorar por categoría
+        </h2>
+        <ul className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 text-sm sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+          {browsableCategories.map((c) => (
+            <li key={c.slug} className="shrink-0">
+              <Link
+                href={categoryHref(c.slug)}
+                className="inline-block whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-ink-muted hover:border-pulse-500 hover:text-ink"
+              >
+                {c.name} <span className="font-mono text-xs tabular-nums">({c.total})</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <div className="mt-8">
         <ViewToggleProvider>
