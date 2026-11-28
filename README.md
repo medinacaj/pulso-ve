@@ -9,7 +9,7 @@ existente: identidad visual, arquitectura, código y metodología propios.
 **Estado del código (13/11/2026):** catálogo ampliado a 579 fichas, 18 categorías y 47 tipos de problema. La aplicación Next.js dispone de reportes, incidentes, mapas, estadísticas y metodología para trabajar con una base PostgreSQL; el sitio GitHub Pages es solo una demostración sin backend.
 Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, criterios de incorporación y restricciones de cobertura.
 
-**Aún no está aprobado para indexación ni publicación productiva:** ya existen `src/app/robots.ts`, `src/app/sitemap.ts`, `src/lib/seo.ts` y metadatos Open Graph en `src/app/layout.tsx`. La indexación sigue deshabilitada por defecto y solo se habilita explícitamente con `SITE_URL` válido y `PUBLIC_INDEXABLE=true`. Faltan favicon, revisar datos estructurados, verificar salida HTTP/SEO en un entorno real, configurar dominio y decidir cuándo permitir indexación. La auditoría original de octubre en `docs/SEO-PENDIENTE.md` es una referencia histórica, no una lista vigente de funcionalidades ausentes.
+**Aún no está aprobado para indexación ni publicación productiva:** ya existen `src/app/robots.ts`, `src/app/sitemap.ts`, `src/lib/seo.ts` y metadatos Open Graph en `src/app/layout.tsx`. La indexación sigue deshabilitada por defecto y solo se habilita explícitamente con `SITE_URL` válido y `PUBLIC_INDEXABLE=true`. Mientras tanto, `robots.txt` permite el rastreo (salvo `/api/`) para que los buscadores lean el `noindex` de cada página; no usa `Disallow: /`. Faltan favicon, revisar datos estructurados, verificar salida HTTP/SEO en un entorno real, configurar dominio y decidir cuándo permitir indexación. La auditoría original de octubre en `docs/SEO-PENDIENTE.md` es una referencia histórica, no una lista vigente de funcionalidades ausentes.
 
 ## Qué existe hoy
 
@@ -33,7 +33,7 @@ Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, 
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 242 pruebas automatizadas (datos semilla y calidad del catálogo, registro
+- 245 pruebas automatizadas (datos semilla y calidad del catálogo, registro
   de rutas de navegación, privacidad, bandas de estado, integración real de
   `POST /api/reports`, estadística robusta del motor, combinación ponderada
   de señales).
@@ -206,7 +206,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (242 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (245 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |

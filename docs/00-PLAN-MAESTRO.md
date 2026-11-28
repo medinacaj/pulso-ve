@@ -698,3 +698,18 @@ Cashea.
   `VE-M`; sin cabeceras o con otro país no se puede enviar sin elegir; con la
   configuración por defecto se ignoran las cabeceras y la elección manual se envía.
 - **No verificado:** Cloudflare o Vercel reales (no hay despliegue con ellos).
+
+### robots.txt: rastreo permitido con noindex — 2026-11-28
+
+- Decisión de la persona propietaria: `robots.txt` ya no responde `Disallow: /` mientras
+  el sitio no se indexa. Siempre `Allow: /` y `Disallow: /api/`; con
+  `PUBLIC_INDEXABLE=true` añade `Sitemap:`. La no indexación la hace el `noindex` del
+  layout, que Google solo puede leer si rastrea. Se quitó `/admin/` (no existía y no se
+  anuncian rutas administrativas).
+- Pruebas: `tests/robots.test.ts` (3). Total: 245.
+- Verificado con `next dev` y agente Googlebot: las 18 páginas estáticas llevan
+  `noindex` en el `<head>` (también las que redirigen: `/cuenta` y `/centro-control`), y
+  un servicio inexistente da 404 con `noindex`. Con `SITE_URL=https://ejemplo.org` y
+  `PUBLIC_INDEXABLE=true`: `robots.txt` añade `Sitemap:` y las páginas públicas pasan a
+  `index, follow`, mientras el Centro de Control sigue con `noindex`.
+- **No verificado:** dominio real, caché del hosting y Search Console.
