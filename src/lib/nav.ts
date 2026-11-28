@@ -31,3 +31,15 @@ export const ROUTE = {
 export function isRouteAvailable(route: RouteInfo): boolean {
   return route.available;
 }
+
+/**
+ * Rutas dinámicas (una página por fila de la base). No están en `ROUTE` porque no
+ * tienen un `page.tsx` propio por valor; existen mientras exista la fila.
+ */
+export function categoryHref(slug: string): string {
+  return '/categorias/' + encodeURIComponent(slug);
+}
+
+export function serviceHref(slug: string): string {
+  return '/servicios/' + encodeURIComponent(slug);
+}
