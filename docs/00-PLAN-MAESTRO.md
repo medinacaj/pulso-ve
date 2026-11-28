@@ -661,3 +661,18 @@ Cashea.
 - `.gitignore`: `CLAUDE.local.md` y `.claude/settings.local.json`.
 - **No verificado:** `npm run build` (Google Fonts bloqueado en el entorno); el
   bootstrap fuera de Linux; nada del SEO contra un dominio real.
+
+### robots.txt: rastreo permitido con noindex — 2026-11-28
+
+- Decisión de la persona propietaria: `robots.txt` ya no responde `Disallow: /` mientras
+  el sitio no se indexa. Siempre `Allow: /` y `Disallow: /api/`; con
+  `PUBLIC_INDEXABLE=true` añade `Sitemap:`. La no indexación la hace el `noindex` del
+  layout, que Google solo puede leer si rastrea. Se quitó `/admin/` (no existía y no se
+  anuncian rutas administrativas).
+- Pruebas: `tests/robots.test.ts` (3).
+- Verificado con `next dev` y agente Googlebot: las 18 páginas estáticas llevan
+  `noindex` en el `<head>` (también las que redirigen: `/cuenta` y `/centro-control`), y
+  un servicio inexistente da 404 con `noindex`. Con `SITE_URL=https://ejemplo.org` y
+  `PUBLIC_INDEXABLE=true`: `robots.txt` añade `Sitemap:` y las páginas públicas pasan a
+  `index, follow`, mientras el Centro de Control sigue con `noindex`.
+- **No verificado:** dominio real, caché del hosting y Search Console.

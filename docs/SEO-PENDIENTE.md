@@ -64,7 +64,7 @@ Prioridad: **P0** bloquea la publicación · **P1** hacerlo antes de pedir index
 
 | # | Pri. | Hallazgo (verificado) | Qué hacer |
 |---|---|---|---|
-| S1 | P0 | `/robots.txt` → **404**. | `src/app/robots.ts`. En producción: `allow: /`, `disallow: /api/` (JSON sin valor de búsqueda; hoy solo el envío del formulario usa la API, no el renderizado) y `sitemap: <SITE_URL>/sitemap.xml`. En cualquier otro entorno: `disallow: /`. Decidir por una variable explícita, no por suposición, y **quitar el bloqueo al pasar a producción**. No listar nunca rutas administrativas (se protegen con autenticación y `noindex`). Se cachea por defecto: comprobar el resultado tras `next build`. |
+| S1 | P0 | `/robots.txt` → **404**. | `src/app/robots.ts`. En producción: `allow: /`, `disallow: /api/` (JSON sin valor de búsqueda; hoy solo el envío del formulario usa la API, no el renderizado) y `sitemap: <SITE_URL>/sitemap.xml`. ~~En cualquier otro entorno: `disallow: /`~~ (sustituido el 2026-11-28 por rastreo permitido + `noindex`, ver sección 5). Decidir por una variable explícita, no por suposición, y **quitar el bloqueo al pasar a producción**. No listar nunca rutas administrativas (se protegen con autenticación y `noindex`). Se cachea por defecto: comprobar el resultado tras `next build`. |
 | S2 | P0 | `/sitemap.xml` → **404**. | `src/app/sitemap.ts`: `/`, `/servicios` y `/servicios/<slug>` de los servicios `active = true` (la página de un servicio inactivo ya responde 404). Solo rutas disponibles según `nav.ts`; URLs absolutas con el dominio canónico; sin filtros ni parámetros. Lee la base de datos, así que debe ser dinámico o revalidarse (si no, queda congelado en el build). `lastModified` solo si es real: `services.updated_at` sirve únicamente si se actualiza al editar; no poner `new Date()` en todo. Una prueba debe fallar si aparece una ruta no disponible, una URL relativa o un duplicado. |
 | S3 | P0 | No hay dominio ni `metadataBase`; `src/app/layout.tsx` no lo define (con una ruta relativa en canonical u Open Graph, el build falla). | Variable de entorno con el dominio canónico (p. ej. `SITE_URL`, añadida a `.env.example` con valor de ejemplo), usada en `metadataBase`, `robots` y `sitemap`. Elegir `www` o sin `www` y redirigir la otra variante con 301/308, igual que `http` → `https`. |
 | S4 | P1 | Ninguna página tiene `<link rel="canonical">`. | `alternates.canonical` en la portada, en `/servicios` y en `/servicios/[slug]` (en las dinámicas, dentro de `generateMetadata`). |
@@ -97,6 +97,14 @@ esta podría serlo, pero la decisión es de negocio:
 Mi recomendación es **A o B**. Sea cual sea la elección, hay que escribirla aquí y
 acordarla con `robots.ts`, la metadata y el sitemap (una URL con `noindex` no va en el
 sitemap). No hay una opción neutral: sin decidir, el valor por defecto sería C.
+
+**Aplicado (2026-11-28, autorizado por la persona propietaria): A, con el `noindex` solo
+en la metadata.** Mientras `PUBLIC_INDEXABLE` no sea `true` (con `SITE_URL` HTTPS válido),
+todas las páginas llevan `noindex` y el sitemap está vacío, pero `robots.txt` **permite el
+rastreo** (`Allow: /`, `Disallow: /api/`). Antes respondía `Disallow: /`, y así Google no
+podía leer el `noindex`: una URL enlazada desde fuera podía acabar indexada sin contenido.
+Al activar la indexación solo se añade la línea `Sitemap:`. `robots.txt` no nombra rutas
+administrativas; el Centro de Control y las cuentas llevan su propio `noindex`.
 
 ## 6. Orden de trabajo y pasos para la persona propietaria
 
